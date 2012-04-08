@@ -4,7 +4,6 @@
   <App xmlns="" ProductID="{9d6bece9-d091-40e4-8623-db423d960c2b}" Title="SwipperPlus" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal"  Author="SwipperPlus author" Description="Sample description" Publisher="SwipperPlus">
     <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
     <Capabilities>
-      <Capability Name="ID_CAP_GAMERSERVICES"/>
       <Capability Name="ID_CAP_IDENTITY_DEVICE"/>
       <Capability Name="ID_CAP_IDENTITY_USER"/>
       <Capability Name="ID_CAP_LOCATION"/>
@@ -27,7 +26,7 @@
         <TemplateType5>
           <BackgroundImageURI IsRelative="true" IsResource="false">Background.png</BackgroundImageURI>
           <Count>0</Count>
-          <Title>SwipperPlus</Title>
+          <Title>Swipper+</Title>
         </TemplateType5>
       </PrimaryToken>
     </Tokens>
