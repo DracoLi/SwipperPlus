@@ -52,39 +52,57 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Facebook.5.4.1.0\sl3-wp\Facebook.dll</HintPath>
     </Reference>
+    <Reference Include="Hammock.WindowsPhone.Mango">
+      <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\Hammock.WindowsPhone.Mango.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib.WindowsPhone">
+      <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\ICSharpCode.SharpZipLib.WindowsPhone.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Phone.Interop" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.5.2\lib\sl4-windowsphone71\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.Phone.Reactive" />
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="ReactiveOAuth.WP7">
+      <HintPath>..\packages\ReactiveOAuth-WP7.0.4.0.0\lib\ReactiveOAuth.WP7.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Observable" />
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
     <Reference Include="System.Xml" />
     <Reference Include="mscorlib.extensions" />
+    <Reference Include="TweetSharp.WindowsPhone.Mango">
+      <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\TweetSharp.WindowsPhone.Mango.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Comment.cs" />
+    <Compile Include="Models\FacebookComment.cs" />
     <Compile Include="Models\Attachment.cs" />
     <Compile Include="Models\FacebookItem.cs" />
     <Compile Include="Models\People.cs" />
-    <Compile Include="Models\Person.cs" />
-    <Compile Include="Models\SWFeed.cs" />
+    <Compile Include="Models\FacebookUser.cs" />
+    <Compile Include="Models\SWFacebookFeed.cs" />
+    <Compile Include="Models\SWLinkedInFeed.cs" />
+    <Compile Include="Settings\SWLinkedInSettings.cs" />
+    <Compile Include="Settings\SWTwitterSettings.cs" />
+    <Compile Include="Utils\FacebookParser.cs" />
     <Compile Include="Utils\GeneralUtils.cs" />
-    <Compile Include="Utils\ParserUtils.cs" />
-    <Compile Include="Utils\SWFacebookUtils.cs" />
+    <Compile Include="Settings\SWFacebookSettings.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Storage.cs" />
-    <Compile Include="Utils\SWTypes.cs" />
     <Compile Include="ViewModels\SWFacebookManager.cs" />
+    <Compile Include="ViewModels\SWLinkedInManager.cs" />
     <Compile Include="ViewModels\SWSocialLinkManager.cs" />
+    <Compile Include="ViewModels\SWTwitterManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -113,7 +131,6 @@
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Models\Feed\" />
     <Folder Include="Views\" />
   </ItemGroup>
   <ItemGroup>

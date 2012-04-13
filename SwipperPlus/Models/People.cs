@@ -7,8 +7,7 @@ namespace SwipperPlus.Models
 {
   public static class People
   {
-    public static Dictionary<UInt64, Person> FBPeople = new Dictionary<ulong,Person>();
-    public static Dictionary<UInt64, Person> TwitterPeople = new Dictionary<ulong, Person>();
-    public static Dictionary<UInt64, Person> LinkedInPeople = new Dictionary<ulong, Person>();
+    public static Dictionary<string, FacebookUser> FBPeople = new Dictionary<string,FacebookUser>();
+    public static Dictionary<string, FacebookUser> LinkedInPeople = new Dictionary<string, FacebookUser>();
   }
 }
