@@ -26,7 +26,11 @@
         </StackPanel>
 
         <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0"></Grid>
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+          <Button Content="Connect" Height="113" HorizontalAlignment="Left" Margin="128,169,0,0" Name="button1" VerticalAlignment="Top" Width="247" Click="button1_Click" />
+          <Button Content="Get it" Height="115" HorizontalAlignment="Left" Margin="140,319,0,0" Name="button2" VerticalAlignment="Top" Width="235" Click="button2_Click" />
+      <phone:WebBrowser Margin="0,3,0,1" ScrollViewer.VerticalScrollBarVisibility="Visible" Height="Auto" Name="authBrowser" IsScriptEnabled="True" Navigating="authBrowser_Navigating" Navigated="authBrowser_Navigated" LoadCompleted="authBrowser_LoadCompleted" Visibility="Collapsed"/>
+        </Grid>
     </Grid>
  
     <phone:PhoneApplicationPage.ApplicationBar>

@@ -9,6 +9,8 @@
 *  Basical interactions such as comment, like, and share/retweet is possible
 *  Support image gallery style
 
+---
+
 ## Layout
 -  Hidden tray for managing accounts and link information
 -  Hidden tray also allows users to get to settings (if any)
@@ -16,29 +18,44 @@
 -  Each feed has same width but different height.
 -  Although data is different across different social feeds, will try best to align feed layout within app
 
-## Classes Required (SW for prefix)
--  SWMain (The main class that will display all feeds)
+---
 
--  SWFeed (A abstract class for all feeds)
-  - SWImageFeed
-  - SWTextFeed
-  - SWConversationFeed
-  - SWLinkFeed
+## Project Structure
 
--  SWLinksView (A class that allow users to manage social links)
+#### MainPage
+The MainPage displays the social lists and create the ViewModels to populate the lists.
 
--  SWSettingsView (A class for managing settings)
+#### Models
+-  SWFeed (An abstract class for all feeds)
+  -  SWImageFeed
+  -  SWStatusFeed
+  -  SWActionFeed
+  -  SWConversationFeed
+  -  SWLinkFeed
 
--  SWStreamView (A class that takes in a sociallink and display in on stream)
+#### ViewModels
+ViewsModels are responsible for getting the data and binding them to the view. 
+ViewModels should all have a ObservableCollection so that the view updates.
+In our implementation, ViewModels are called Managers.
 
--  SWImageView (A view displaying a large image)
+-  SWSocialLinkManager (Abstract class for each Social Manager)
+  -  SWFacebookManager (Contains a list of facebook feeds)
+  -  SWTwitterManager (Contains a list of twitter feeds)
+  -  SWLinkedInManager (Contains a list of LinkedIn feeds)
 
--  SWDataManager (Class for handling caching and fetching info)
+#### Views
+For each feed style, we have a view for it.
 
--  SWSocialLink (Abstract class for each social link)
-  -  SWFacebookManager (Class for getting Facebook info)
-  -  SWTwitterManager (Class for getting Twitter info)
-  -  SWLinkedInManager (Class for getting LinkedIn info)
+-  SWImageFeed
+-  SWStatusFeed
+-  SWActionFeed
+-  SWLinkFeed
+
+-  SWChannelsView
+
+#### Utils
+
+---
 
 ## Notes
 -  A data analytics service will be attached to the project to collect user behaviour.

@@ -9,10 +9,10 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
-namespace SwipperPlus
+namespace SwipperPlus.ViewModels
 {
-    public abstract class SWSocialLink
-    {
+  public abstract class SWSocialLinkManager
+  {
 
-    }
+  }
 }
