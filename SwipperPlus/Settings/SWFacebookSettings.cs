@@ -1,26 +1,25 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
-using SwipperPlus.Utils;
 using System.Collections.Generic;
-using System.Text;
+using Codeplex.OAuth;
+using SwipperPlus.Utils;
 
 namespace SwipperPlus.Settings
 {
   public static class SWFacebookSettings
   {
     // Facebook configs
-    private const string AppID = "360095330708489";
-    private const string AppSecret = "3b90796ee141966c6e010007ca4dfbbc";
+    public const string ConsumerKey           = "360095330708489";
+    public const string ConsumerSecret        = "3b90796ee141966c6e010007ca4dfbbc";
 
     // Constants
-    private const string AccessToken = "FacebookAccessToken";
+    private const string FacebookAccessToken  = "FacebookAccessToken";
+    private static string FacebookEnabled = "FacebookEnabled";
 
     public static Dictionary<string, object> GetLoginParameters()
     {
       var loginParameters = new Dictionary<string, object>
       {
-        {"client_id", AppID},
+        {"client_id", ConsumerKey},
         {"response_type", "token"},
         {"display", "touch"},
         {"scope", "read_stream,user_groups,manage_notifications"},
@@ -29,24 +28,36 @@ namespace SwipperPlus.Settings
       return loginParameters;
     }
 
-    public static bool HasAccessToken()
+    public static bool IsConnected()
     {
-      return !string.IsNullOrEmpty(GetAccessToken());
+      return StorageUtils.HasKeyValue(FacebookAccessToken);
+    }
+
+    public static void SetEnabled(bool enabled)
+    {
+      if (enabled) StorageUtils.SetKeyValue<bool>(FacebookEnabled, true);
+      else StorageUtils.RemoveKeyValue(FacebookEnabled);
+    }
+
+    public static bool IsEnabled()
+    {
+      return StorageUtils.HasKeyValue(FacebookEnabled);
     }
 
     public static string GetAccessToken()
-    { 
-      return Storage.GetKeyValue<string>(AccessToken);
+    {
+      if (!IsConnected()) return null;
+      return StorageUtils.GetKeyValue<string>(FacebookAccessToken);
     }
 
-    public static void SaveAccessToken(string token)
+    public static void SetAccessToken(string token)
     {
-      Storage.SetKeyValue<string>(AccessToken, token);
+      StorageUtils.SetKeyValue<string>(FacebookAccessToken, token);
     }
 
-    public static void RemoveAccessTokens()
+    public static void RemoveAccessToken()
     {
-      Storage.SetKeyValue<string>(AccessToken, null);
+      StorageUtils.RemoveKeyValue(FacebookAccessToken);
     }
   }
 }

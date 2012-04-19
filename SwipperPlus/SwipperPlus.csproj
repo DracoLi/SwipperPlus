@@ -25,6 +25,8 @@
     <SilverlightAppEntry>SwipperPlus.App</SilverlightAppEntry>
     <ValidateXaml>true</ValidateXaml>
     <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <Utf8Output>true</Utf8Output>
+    <ExpressionBlendVersion>4.0.30816.0</ExpressionBlendVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -59,6 +61,9 @@
       <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\ICSharpCode.SharpZipLib.WindowsPhone.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Phone" />
+    <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL">
+      <HintPath>..\packages\SilverlightToolkitWP.4.2011.12.14\lib\sl4-windowsphone71\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Phone.Interop" />
     <Reference Include="Microsoft.Phone.Reactive" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -82,27 +87,39 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\FacebookComment.cs" />
-    <Compile Include="Models\Attachment.cs" />
-    <Compile Include="Models\FacebookItem.cs" />
-    <Compile Include="Models\People.cs" />
-    <Compile Include="Models\FacebookUser.cs" />
-    <Compile Include="Models\SWFacebookFeed.cs" />
-    <Compile Include="Models\SWLinkedInFeed.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Models\Connection.cs" />
+    <Compile Include="Models\Facebook\FacebookComment.cs" />
+    <Compile Include="Models\Facebook\FacebookAttachment.cs" />
+    <Compile Include="Models\Facebook\FacebookItem.cs" />
+    <Compile Include="Models\Facebook\FacebookUser.cs" />
+    <Compile Include="Models\Facebook\FacebookFeed.cs" />
+    <Compile Include="Models\LinkedIn\LinkedInFeed.cs" />
+    <Compile Include="Models\LinkedIn\LinkedInUser.cs" />
+    <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\SWLinkedInSettings.cs" />
     <Compile Include="Settings\SWTwitterSettings.cs" />
-    <Compile Include="Utils\FacebookParser.cs" />
+    <Compile Include="Utils\Converters\BoolConverters.cs" />
+    <Compile Include="Utils\Parsers\FacebookParser.cs" />
     <Compile Include="Utils\GeneralUtils.cs" />
     <Compile Include="Settings\SWFacebookSettings.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\Storage.cs" />
+    <Compile Include="Utils\Parsers\LinkedInParser.cs" />
+    <Compile Include="Utils\StorageUtils.cs" />
+    <Compile Include="ViewModels\ConnectionManager.cs" />
     <Compile Include="ViewModels\SWFacebookManager.cs" />
     <Compile Include="ViewModels\SWLinkedInManager.cs" />
     <Compile Include="ViewModels\SWSocialLinkManager.cs" />
     <Compile Include="ViewModels\SWTwitterManager.cs" />
+    <Compile Include="Views\AuthorizationView.xaml.cs">
+      <DependentUpon>AuthorizationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\AuthBrowser.xaml.cs">
+      <DependentUpon>AuthBrowser.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -110,6 +127,14 @@
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
     <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AuthorizationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AuthBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -129,12 +154,23 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="SplashScreenImage.jpg" />
+    <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Check.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Delete.png" />
+    <Content Include="Toolkit.Content\ApplicationBar.Select.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\" />
+    <Folder Include="Views\Facebook\" />
+    <Folder Include="Views\LinkedIn\" />
+    <Folder Include="Views\Twitter\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <DesignData Include="SampleData\ConnectionsManagerSampleData.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </DesignData>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

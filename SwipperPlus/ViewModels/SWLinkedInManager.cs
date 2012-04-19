@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
-using SwipperPlus.Models;
+using SwipperPlus.Model;
+using SwipperPlus.Settings;
 
-namespace SwipperPlus.ViewModels
+namespace SwipperPlus.Model
 {
   public class SWLinkedInManager : SWSocialLinkManager
   {
@@ -13,12 +14,17 @@ namespace SwipperPlus.ViewModels
     
     }
 
-    public override bool HasValidAccessToken()
+    public static bool IsConnected()
+    {
+      return SWTwitterSettings.IsConnected();
+    }
+
+    public override void FetchFeeds()
     {
       throw new NotImplementedException();
     }
 
-    public override void FetchFeeds()
+    public override void UpdateFeeds()
     {
       throw new NotImplementedException();
     }

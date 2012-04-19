@@ -9,17 +9,10 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
-namespace SwipperPlus.Models
+namespace SwipperPlus.Settings
 {
-  /// <summary>
-  /// This represents a comment for a feed
-  /// </summary>
-  public class FacebookComment
+  public static class GeneralSettings
   {
-    public string Message;
-    public UInt64 UserID;
-    public DateTime Date;
-    public int Likes;
-    public bool UserLiked;
+    public const int FeedsToGet = 10;
   }
 }

@@ -3,8 +3,16 @@ using System.IO.IsolatedStorage;
 
 namespace SwipperPlus.Utils
 {
-  public static class Storage
+  public static class StorageUtils
   {
+    /// <summary>
+    /// Check if something exists
+    /// </summary>
+    internal static bool HasKeyValue(string key)
+    {
+      return IsolatedStorageSettings.ApplicationSettings.Contains(key);
+    }
+
     /// <summary>
     /// Get Something from localstorage
     /// </summary>
@@ -17,7 +25,7 @@ namespace SwipperPlus.Utils
     }
 
     /// <summary>
-    /// Save something to the local storange identified by key
+    /// Save something to the local storage identified by key
     /// </summary>
     internal static void SetKeyValue<T>(string key, T value)
     {
@@ -32,6 +40,17 @@ namespace SwipperPlus.Utils
         if (value != null)
           IsolatedStorageSettings.ApplicationSettings.Add(key, value);
       IsolatedStorageSettings.ApplicationSettings.Save();
+    }
+
+    /// <summary>
+    /// Remove something from the local storage
+    /// </summary>
+    internal static void RemoveKeyValue(string key)
+    {
+      if (IsolatedStorageSettings.ApplicationSettings.Contains(key))
+      {
+        IsolatedStorageSettings.ApplicationSettings.Remove(key);
+      }
     }
   }
 }

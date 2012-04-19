@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using SwipperPlus.Models;
+using SwipperPlus.Model.Facebook;
 using SwipperPlus.Utils;
 
-namespace SwipperPlus.Utils
+namespace SwipperPlus.Utils.Parsers
 {
-  public class FacebookParser
+  public static class FacebookParser
   {
     /// <summary>
     /// Parses a Facebook feed
     /// </summary>
-    public static SWFacebookFeed ParseFeed(JToken token)
+    public static FacebookFeed ParseFeed(JToken token)
     {
-      SWFacebookFeed result = new SWFacebookFeed();
+      FacebookFeed result = new FacebookFeed();
 
       // Add info every feed has
-      result.Message = TokenHasValue(token["message"]) ? (string)token["message"] : null;
+      result.Message = tokenHasValue(token["message"]) ? (string)token["message"] : null;
       result.ID = (string)token["post_id"];
-      if (TokenHasValue(token["actor_id"]))
+      if (tokenHasValue(token["actor_id"]))
         result.SourcePerson = (UInt64)token["actor_id"];
       result.Date = GeneralUtils.UnixTimestampToDateTime((Int64)token["created_time"]);
 
@@ -26,7 +26,7 @@ namespace SwipperPlus.Utils
       FacebookItem fbItem = new FacebookItem();
 
       // Likes
-      if (TokenHasValue(token["likes"]["count"]))
+      if (tokenHasValue(token["likes"]["count"]))
       {
         fbItem.LikesCount = (int)token["likes"]["count"];
         List<UInt64> flikes = new List<UInt64>();
@@ -37,7 +37,7 @@ namespace SwipperPlus.Utils
       }
 
       // Comments
-      if (TokenHasValue(token["comments"]["count"]))
+      if (tokenHasValue(token["comments"]["count"]))
       {
         fbItem.CommentsCount = (int)token["comments"]["count"];
         List<FacebookComment> comments = new List<FacebookComment>();
@@ -47,57 +47,59 @@ namespace SwipperPlus.Utils
           fbItem.Comments = comments;
       }
 
-      result.FacebookProperties = fbItem;
+      result.SocialProperties = fbItem;
 
       // Target person
-      if (TokenHasValue(token["target_id"]))
+      if (tokenHasValue(token["target_id"]))
         result.TargetPerson = (UInt64)token["target_id"];
 
       // Description
-      if (TokenHasValue(token["description"]))
+      if (tokenHasValue(token["description"]))
         result.Description = (string)token["description"];
 
       // Attachment
-      if (TokenHasValue(token["attachment"]) && token.HasValues)
+      if (tokenHasValue(token["attachment"]) && token.HasValues)
       {
-        Attachment fbAttach = new Attachment();
+        FacebookAttachment fbAttach = new FacebookAttachment();
         JToken attachment = token["attachment"];
 
         // Figure out attachment type, href and name
-        fbAttach.Type = Attachment.MediaType.Link; // Defaults to Link type
-        if (TokenHasValue(attachment["href"]))
+        fbAttach.Type = FacebookAttachment.MediaType.Link; // Defaults to Link type
+        if (tokenHasValue(attachment["href"]))
           fbAttach.Href = new Uri((string)attachment["href"]);
-        fbAttach.Name = (string)attachment["name"];
+        if (tokenHasValue(attachment["name"]))
+          fbAttach.Name = (string)attachment["name"];
 
         // Adjust values if we have some media in the attachment
-        if (TokenHasValue(attachment["media"]) && attachment["media"].HasValues)
+        if (tokenHasValue(attachment["media"]) && attachment["media"].HasValues)
         {
           JToken media = attachment["media"][0];
 
           // Adjust type
-          if (TokenHasValue(media["type"]))
+          if (tokenHasValue(media["type"]))
           {
             string type = (string)media["type"];
-            if (type.Equals("photo")) fbAttach.Type = Attachment.MediaType.Image;
-            else if (type.Equals("video")) fbAttach.Type = Attachment.MediaType.Video;
+            if (type.Equals("photo")) fbAttach.Type = FacebookAttachment.MediaType.Image;
+            else if (type.Equals("video")) fbAttach.Type = FacebookAttachment.MediaType.Video;
+            else if (type.Equals("link")) fbAttach.Type = FacebookAttachment.MediaType.Link;
           }
 
           // Add Src
-          if (TokenHasValue(media["src"]))
+          if (tokenHasValue(media["src"]))
             fbAttach.Icon = new Uri((string)media["src"]);
 
-          // User media href instead of attachment href
-          if (TokenHasValue(media["href"]))
+          // Use media href instead of attachment href
+          if (tokenHasValue(media["href"]))
             fbAttach.Href = new Uri((string)media["href"]);
         }
 
         // Add this attachment to our feed if we have an href to attach
         if (fbAttach.Href != null)
-          result.AttachmentProperties = fbAttach;
+          result.Attachment = fbAttach;
       }
 
       // Finally add the current feedtype
-      result.FeedType = DetermineFacebookFeedType(result);
+      result.FeedType = DetermineFacebookFeedType(result, (int)token["type"]);
 
       return result;
     }
@@ -107,8 +109,11 @@ namespace SwipperPlus.Utils
     /// </summary>
     public static FacebookUser ParseUser(JToken token)
     {
-      return new FacebookUser(token["id"].ToString(), (string)token["name"],
-        new Uri((string)token["pic_square"]));
+      return new FacebookUser((UInt64)token["id"])
+      {
+        Name = (string)token["name"],
+        Icon = new Uri((string)token["pic_square"])
+      };
     }
 
     /// <summary>
@@ -116,7 +121,7 @@ namespace SwipperPlus.Utils
     /// </summary>
     public static FacebookComment ParseFacebookComment(JToken token)
     {
-      FacebookComment result = new FacebookComment()
+      return new FacebookComment()
       {
         Date = GeneralUtils.UnixTimestampToDateTime((Int64)token["time"]),
         UserID = (UInt64)token["fromid"],
@@ -124,26 +129,28 @@ namespace SwipperPlus.Utils
         Likes = (int)token["likes"],
         UserLiked = (bool)token["user_likes"]
       };
-      return result;
     }
 
     /// <summary>
     /// Guess the type of the facebook feed from the content is has
     /// </summary>
-    private static FeedType DetermineFacebookFeedType(SWFacebookFeed feed)
+    private static FeedType DetermineFacebookFeedType(FacebookFeed feed, int type)
     {
       FeedType result = FeedType.NotSupported;
-      if (feed.AttachmentProperties != null) result = FeedType.Attachment;
-      else if (feed.Description != null) result = FeedType.Action;
-      else if (feed.TargetPerson != 0) result = FeedType.Conversation;
-      else if (feed.Message != null) result = FeedType.Text;
+
+      // Figure out type from supplied type param
+      if      (type == 56 && feed.TargetPerson != 0)      result = FeedType.Conversation;
+      else if ((type == 80 || type == 128 || type == 247) && 
+                feed.Attachment != null)                  result = FeedType.Attachment;
+      else if (type == 46 || feed.Message != null)        result = FeedType.Text;
+      else                                                result = FeedType.Action;
       return result;
     }
 
     /// <summary>
     /// A helper that tells us whether a JToken has any value
     /// </summary>
-    private static bool TokenHasValue(JToken token)
+    private static bool tokenHasValue(JToken token)
     {
       if (token == null) return false;
       return !String.IsNullOrEmpty(token.ToString());

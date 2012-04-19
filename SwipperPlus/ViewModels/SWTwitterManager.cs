@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using TweetSharp;
 using Codeplex.OAuth;
-using SwipperPlus.Models;
+using SwipperPlus.Model;
 using SwipperPlus.Settings;
 using SwipperPlus.Utils;
 
-namespace SwipperPlus.ViewModels
+namespace SwipperPlus.Model
 {
   /**
    * Connects app with Twitter if user authenticated
@@ -21,17 +21,14 @@ namespace SwipperPlus.ViewModels
 
     public SWTwitterManager()
     {
-      if (SWTwitterSettings.HasAccessToken())
-      {
-        twitter = new TwitterService(SWTwitterSettings.ConsumerKey, SWTwitterSettings.ConsumerSecret);
-        AccessToken token = SWTwitterSettings.GetAccessToken();
-        twitter.AuthenticateWith(token.Key, token.Secret);
-      }
+      twitter = new TwitterService(SWTwitterSettings.ConsumerKey, SWTwitterSettings.ConsumerSecret);
+      AccessToken token = SWTwitterSettings.GetAccessToken();
+      twitter.AuthenticateWith(token.Key, token.Secret);
     }
 
-    public override bool HasValidAccessToken()
+    public static bool IsConnected()
     {
-      return twitter != null;
+      return SWTwitterSettings.IsConnected();
     }
 
     /// <summary>
@@ -39,22 +36,13 @@ namespace SwipperPlus.ViewModels
     /// </summary>
     public override void FetchFeeds()
     {
-      this.twitter.ListTweetsOnHomeTimeline(10, (IEnumerable<TwitterStatus> statuses, TwitterResponse response) =>
-        {
-          if (response.StatusCode == HttpStatusCode.OK)
-          {
-            System.Diagnostics.Debug.WriteLine(response.StatusDescription);
-            Feeds = new List<TwitterStatus>();
-            foreach (TwitterStatus tweet in statuses)
-              Feeds.Add(tweet);
-            OnRaiseFeedsEvent(new SocialLinkEventArgs(null));
-          }
-          else
-          {
-            OnRaiseFeedsEvent(new SocialLinkEventArgs("Cannot receive Twitter feeds"));
-          }
-        }
-      );
+      Feeds = new List<TwitterStatus>();
+      this.twitter.ListTweetsOnHomeTimeline(GeneralSettings.FeedsToGet, tw_HandleCallback);
+    }
+
+    public override void UpdateFeeds()
+    {
+      this.twitter.ListTweetsOnHomeTimelineSince(Feeds[0].Id, tw_HandleCallback);
     }
 
     public override void SaveFeeds()
@@ -70,6 +58,29 @@ namespace SwipperPlus.ViewModels
     public override void LoadSavedFeeds()
     {
       throw new NotImplementedException();
+    }
+
+    private void tw_HandleCallback(IEnumerable<TwitterStatus> statuses, TwitterResponse response)
+    {
+      if (response.StatusCode == HttpStatusCode.OK)
+      {
+        // Determine feed status
+        FeedStatus status = Feeds.Count == 0 ? FeedStatus.New : FeedStatus.Updated;
+
+        // Save retrieved twitter feeds
+        List<TwitterStatus> tempFeeds = new List<TwitterStatus>();
+        foreach (TwitterStatus tweet in statuses)
+          tempFeeds.Add(tweet);
+
+        // Add new feeds to top of list
+        Feeds.InsertRange(0, tempFeeds);
+
+        OnRaiseFeedsEvent(new SocialLinkEventArgs(status));
+      }
+      else
+      {
+        OnRaiseFeedsEvent(new SocialLinkEventArgs("Cannot receive Twitter feeds"));
+      }
     }
   }
 }

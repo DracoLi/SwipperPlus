@@ -3,23 +3,23 @@ using System.Net;
 using System.Windows;
 using SwipperPlus.Utils;
 
-namespace SwipperPlus.Models
+namespace SwipperPlus.Model.Facebook
 {
   /// <summary>
   /// Represents a person
   /// </summary>
   public class FacebookUser
   {
-    public string ID;
+    public UInt64 ID;
     public string Name;
     public Uri Icon;
 
-    public FacebookUser(string id)
+    public FacebookUser(UInt64 id)
     {
       ID = id;
     }
 
-    public FacebookUser(string id, string name, Uri icon)
+    public FacebookUser(UInt64 id, string name, Uri icon)
     {
       ID = id;
       Name = name;

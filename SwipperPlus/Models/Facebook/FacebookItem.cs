@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
 using System.Collections.Generic;
-using SwipperPlus.Models;
+using SwipperPlus.Model;
 
-namespace SwipperPlus.Models
+namespace SwipperPlus.Model.Facebook
 {
   /// <summary>
   /// Data that only a Facebook feed will have

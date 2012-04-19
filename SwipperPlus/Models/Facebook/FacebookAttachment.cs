@@ -3,20 +3,31 @@ using System.Net;
 using System.Windows;
 using SwipperPlus.Utils;
 
-namespace SwipperPlus.Models
+namespace SwipperPlus.Model.Facebook
 {
   /// <summary>
   /// This represents an attachment for a feed
   /// </summary>
-  public class Attachment
+  public class FacebookAttachment
   {
+    /// <summary>
+    /// Different media types an attachment can be
+    /// </summary>
     public enum MediaType { Video, Link, Image };
 
-    // The real url of the attachment
+    /// <summary>
+    /// The real url of the attachment
+    /// </summary>
     public Uri Href { get; set; }
 
-    // The type of the attachment
+    /// <summary>
+    /// The type of the attachment
+    /// </summary>
     public MediaType Type { get; set; }
+
+    /// <summary>
+    /// Name of attachment
+    /// </summary>
     public string Name { get; set; }
     public Uri Icon { get; set; }
   }

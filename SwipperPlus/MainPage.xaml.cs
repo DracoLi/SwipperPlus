@@ -11,8 +11,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
 using Facebook;
-using SwipperPlus.Models;
-using SwipperPlus.ViewModels;
+using SwipperPlus.Model;
 using SwipperPlus.Settings;
 using TweetSharp;
 using SwipperPlus.Utils;
@@ -28,6 +27,7 @@ namespace SwipperPlus
     private OAuthRequestToken twRequestToken;
     private SWFacebookManager facebookManager;
     private SWTwitterManager twitterManager;
+    private SWLinkedInManager linkedinManager;
     private RequestToken linkedInRequestToken;
 
     // Constructor
@@ -51,7 +51,7 @@ namespace SwipperPlus
       FacebookOAuthResult rs;
       if (FacebookOAuthResult.TryParse(e.Uri, out rs)) {
         if (rs.IsSuccess) {
-          SWFacebookSettings.SaveAccessToken(rs.AccessToken);
+          SWFacebookSettings.SetAccessToken(rs.AccessToken);
         }else {
           MessageBox.Show("facebook autho failed");
         }
@@ -83,20 +83,26 @@ namespace SwipperPlus
 
     private void button2_Click(object sender, RoutedEventArgs e)
     {
+      if (!SWFacebookSettings.IsConnected())
+      {
+        System.Diagnostics.Debug.WriteLine("Account not linked yet!");
+        return;
+      }
+
       if (facebookManager == null)
       {
         facebookManager = new SWFacebookManager();
         facebookManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(fm_FeedsChanged);
       }
-        
-      if (facebookManager.HasValidAccessToken())
-        facebookManager.FetchFeeds();
+      facebookManager.FetchFeeds();
     }
 
     void fm_FeedsChanged(object sender, SocialLinkEventArgs e)
     {
       if (e.Error != null)
         System.Diagnostics.Debug.WriteLine(e.Error.Message);
+      else
+        System.Diagnostics.Debug.WriteLine(e.Status);
     }
 
     private void button3_Click(object sender, RoutedEventArgs e)
@@ -123,20 +129,27 @@ namespace SwipperPlus
 
     private void button4_Click(object sender, RoutedEventArgs e)
     {
+      if (!SWTwitterManager.IsConnected())
+      {
+        System.Diagnostics.Debug.WriteLine("Account not linked yet!");
+        return;
+      }
+
       if (twitterManager == null)
       {
         twitterManager = new SWTwitterManager();
         twitterManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(st_FeedsChanged);
       }
-        
-      if (twitterManager.HasValidAccessToken())
-        twitterManager.FetchFeeds();
+
+      twitterManager.FetchFeeds();
     }
 
     void st_FeedsChanged(object sender, SocialLinkEventArgs e)
     {
       if (e.Error != null)
         System.Diagnostics.Debug.WriteLine(e.Error.Message);
+      else
+        System.Diagnostics.Debug.WriteLine(e.Status);
     }
 
     private void button5_Click(object sender, RoutedEventArgs e)
@@ -156,7 +169,16 @@ namespace SwipperPlus
 
     private void button6_Click(object sender, RoutedEventArgs e)
     {
-      OAuthClient client = new OAuthClient(SWLinkedInSettings.ConsumerKey, SWLinkedInSettings.ConsumerSecret, SWLinkedInSettings.GetAccessToken())
+      if (!SWLinkedInManager.IsConnected())
+      {
+        System.Diagnostics.Debug.WriteLine("LinkedIn is not connected!");
+        return;
+      }
+
+      if (linkedinManager == null) linkedinManager = new SWLinkedInManager();
+
+      OAuthClient client = new OAuthClient(SWLinkedInSettings.ConsumerKey,
+        SWLinkedInSettings.ConsumerSecret, SWLinkedInSettings.GetAccessToken())
       {
         Url = "http://api.linkedin.com/v1/people/~/network/updates",
         Parameters = { { "format", "json" } }
@@ -193,7 +215,7 @@ namespace SwipperPlus
         else
         {
           // Now that we got the access token, we can save the tokens
-          SWTwitterSettings.SetAccessToken(token);
+          SWTwitterSettings.SetAccessToken(new AccessToken(token.Token, token.TokenSecret));
 
           // Notify UI we can twitter feeds now
         }
@@ -225,7 +247,26 @@ namespace SwipperPlus
         {
           SWLinkedInSettings.SetAccessToken(res.Token);
           System.Diagnostics.Debug.WriteLine("Successfully got linkedin access token: " + res.Token.ToString());
+          authBrowser.Visibility = Visibility.Visible;
         });
+    }
+
+    private void facebookUpdate_Click(object sender, RoutedEventArgs e)
+    {
+      if (facebookManager != null) facebookManager.UpdateFeeds();
+      else System.Diagnostics.Debug.WriteLine("Fetch some feeds!");
+    }
+
+    private void twitterUpdate_Click(object sender, RoutedEventArgs e)
+    {
+      if (twitterManager != null) twitterManager.UpdateFeeds();
+      else System.Diagnostics.Debug.WriteLine("Fetch some feeds!");
+    }
+
+    private void linkedIn_Click(object sender, RoutedEventArgs e)
+    {
+      if (linkedinManager != null) linkedinManager.UpdateFeeds();
+      else System.Diagnostics.Debug.WriteLine("Fetch some feeds!");
     }
   }
 }
