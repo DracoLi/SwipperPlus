@@ -4,7 +4,7 @@ using System.ComponentModel;
 using SwipperPlus.Model;
 using SwipperPlus.Settings;
 
-namespace SwipperPlus.Model
+namespace SwipperPlus.ViewModel
 {
   /// <summary>
   /// The connection manager acts as a bridge between the connection data and the settings.
@@ -17,6 +17,7 @@ namespace SwipperPlus.Model
 
     public ConnectionsManager()
     {
+      Connections = new ObservableCollection<Connection>();
       populateConnections();
     }
 
@@ -25,7 +26,6 @@ namespace SwipperPlus.Model
       Connection fbfeed = new Connection("Facebook")
       {
         IsConnected = SWFacebookSettings.IsConnected(),
-        IsEnabled = SWFacebookSettings.IsEnabled()
       };
       fbfeed.PropertyChanged += new PropertyChangedEventHandler(fbFeed_PropertyChanged);
       Connections.Add(fbfeed);
@@ -33,7 +33,6 @@ namespace SwipperPlus.Model
       Connection twfeed = new Connection("Twitter")
       {
         IsConnected = SWTwitterSettings.IsConnected(),
-        IsEnabled = SWTwitterSettings.IsEnabled()
       };
       twfeed.PropertyChanged += new PropertyChangedEventHandler(twfeed_PropertyChanged);
       Connections.Add(twfeed);
@@ -41,7 +40,6 @@ namespace SwipperPlus.Model
       Connection lifeed = new Connection("LinkedIn")
       {
         IsConnected = SWLinkedInSettings.IsConnected(),
-        IsEnabled = SWLinkedInSettings.IsEnabled()
       };
       lifeed.PropertyChanged += new PropertyChangedEventHandler(lifeed_PropertyChanged);
       Connections.Add(lifeed);
@@ -50,27 +48,27 @@ namespace SwipperPlus.Model
     private void lifeed_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       Connection c = sender as Connection;
-      if (e.PropertyName.Equals("IsEnabled"))
+      if (e.PropertyName.Equals("IsConnected") && !c.IsConnected)
       {
-        SWLinkedInSettings.SetEnabled(c.IsEnabled);
+        SWLinkedInSettings.RemoveAccessToken();
       }
     }
 
     private void twfeed_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       Connection c = sender as Connection;
-      if (e.PropertyName.Equals("IsEnabled"))
+      if (e.PropertyName.Equals("IsConnected") && !c.IsConnected)
       {
-        SWTwitterSettings.SetEnabled(c.IsEnabled);
+        SWTwitterSettings.RemoveAccessToken();
       }
     }
 
     private void fbFeed_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
       Connection c = sender as Connection;
-      if (e.PropertyName.Equals("IsEnabled"))
+      if (e.PropertyName.Equals("IsConnected") && !c.IsConnected)
       {
-        SWFacebookSettings.SetEnabled(c.IsEnabled);
+        SWFacebookSettings.RemoveAccessToken();
       }
     }
   }

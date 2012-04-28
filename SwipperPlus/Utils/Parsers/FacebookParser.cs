@@ -111,7 +111,7 @@ namespace SwipperPlus.Utils.Parsers
     {
       return new FacebookUser((UInt64)token["id"])
       {
-        Name = (string)token["name"],
+        DisplayName = (string)token["name"],
         Icon = new Uri((string)token["pic_square"])
       };
     }

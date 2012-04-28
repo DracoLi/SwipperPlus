@@ -36,6 +36,14 @@ namespace SwipperPlus.Model.Facebook
     /// </summary>
     public UInt64 TargetPerson { get; set; }
 
+    /// <summary>
+    /// This is the original message pared into rich text box xml format
+    /// </summary>
+    public string XmlMessage { get; set; }
+
+    /// <summary>
+    /// The original message for the feed
+    /// </summary>
     public string Message { get; set; }
 
     /// <summary>

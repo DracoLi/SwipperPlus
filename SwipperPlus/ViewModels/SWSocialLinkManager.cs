@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using SwipperPlus.Model;
 
-namespace SwipperPlus.Model
+namespace SwipperPlus.ViewModel
 {
   public enum FeedStatus { New, Updated, Deleted }
 
   public abstract class SWSocialLinkManager
   {
     public event EventHandler<SocialLinkEventArgs> FeedsChanged;
+
+    public abstract string Title { get; }
 
     /// <summary>
     /// Fetch all feeds from this social link

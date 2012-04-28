@@ -13,7 +13,6 @@ namespace SwipperPlus.Settings
 
     // Constants
     private const string FacebookAccessToken  = "FacebookAccessToken";
-    private static string FacebookEnabled = "FacebookEnabled";
 
     public static Dictionary<string, object> GetLoginParameters()
     {
@@ -31,17 +30,6 @@ namespace SwipperPlus.Settings
     public static bool IsConnected()
     {
       return StorageUtils.HasKeyValue(FacebookAccessToken);
-    }
-
-    public static void SetEnabled(bool enabled)
-    {
-      if (enabled) StorageUtils.SetKeyValue<bool>(FacebookEnabled, true);
-      else StorageUtils.RemoveKeyValue(FacebookEnabled);
-    }
-
-    public static bool IsEnabled()
-    {
-      return StorageUtils.HasKeyValue(FacebookEnabled);
     }
 
     public static string GetAccessToken()

@@ -2,6 +2,8 @@
 using System.Net;
 using System.Windows;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using System.Windows.Media;
 
 namespace SwipperPlus.Utils
 {
@@ -43,6 +45,23 @@ namespace SwipperPlus.Utils
         }
       }
       return nameValueCollection;
+    }
+
+    internal static bool HasInternetConnection()
+    {
+      return NetworkInterface.GetIsNetworkAvailable();
+    }
+
+    internal static SolidColorBrush GetColorFromHex(string hexaColor)
+    {
+      return new SolidColorBrush(
+          Color.FromArgb(
+              Convert.ToByte(hexaColor.Substring(1, 2), 16),
+              Convert.ToByte(hexaColor.Substring(3, 2), 16),
+              Convert.ToByte(hexaColor.Substring(5, 2), 16),
+              Convert.ToByte(hexaColor.Substring(7, 2), 16)
+          )
+      );
     }
   }
 }

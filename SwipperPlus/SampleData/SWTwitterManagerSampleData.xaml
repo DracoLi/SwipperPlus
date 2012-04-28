@@ -1,0 +1,42 @@
+<SwipperPlus_ViewModel:SWTwitterManager 
+	xmlns:SwipperPlus_ViewModel="clr-namespace:SwipperPlus.ViewModel" 
+	xmlns:SwipperPlus_Model_Twitter="clr-namespace:SwipperPlus.Model.Twitter" 
+	xmlns:System="clr-namespace:System;assembly=mscorlib" 
+	xmlns:TweetSharp="clr-namespace:TweetSharp;assembly=TweetSharp.WindowsPhone.Mango" 
+	Title="&lt;Section xml:space=&quot;preserve&quot; HasTrailingParagraphBreakOnPaste=&quot;False&quot; xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;&gt;&lt;Paragraph FontSize=&quot;20&quot; FontFamily=&quot;Segoe WP&quot; Foreground=&quot;#FFFFFFFF&quot; FontWeight=&quot;Normal&quot; FontStyle=&quot;Normal&quot; FontStretch=&quot;Normal&quot; TextAlignment=&quot;Left&quot;&gt;&lt;Run Text=&quot;Hey Nerds, BATMAN PHSYSICS via &quot; /&gt;&lt;Hyperlink NavigateUri=&quot;/Views/SWBrowser.xaml/uri=http://fuckyeahmath.tumblr.com/\&quot;&gt;http://fuckyeahmath.tumblr.com/\&lt;/Hyperlink&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;LineBreak /&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;Hyperlink NavigateUri=&quot;/Views/SWBrowser.xaml/uri=http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png&quot;&gt;http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png&lt;/Hyperlink&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;LineBreak /&gt;&lt;Run Text=&quot;Come and see Mother's &amp;quot;Day&amp;quot; featuring The Girl in the Picture Tries to Hang up the Phone!&quot; /&gt;&lt;/Paragraph&gt;&lt;/Section&gt;">
+	<SwipperPlus_ViewModel:SWTwitterManager.Feeds>
+		<SwipperPlus_Model_Twitter:SWTwitterFeed Date="04/22/2012 14:38:46" IsRetweet="False" Message="Check out our facebook page with updates on current interviews, video's and more! https://www.facebook.com/Uconversation" TwitterDate="50m"
+																						 XmlMessage="&lt;Section xml:space=&quot;preserve&quot; HasTrailingParagraphBreakOnPaste=&quot;False&quot; xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;&gt;&lt;Paragraph FontSize=&quot;20&quot; FontFamily=&quot;Segoe WP&quot; Foreground=&quot;#FFFFFFFF&quot; FontWeight=&quot;Normal&quot; FontStyle=&quot;Normal&quot; FontStretch=&quot;Normal&quot; TextAlignment=&quot;Left&quot;&gt;&lt;Run Text=&quot;Hey Nerds, BATMAN PHSYSICS via &quot; /&gt;&lt;Hyperlink NavigateUri=&quot;/Views/SWBrowser.xaml/uri=http://fuckyeahmath.tumblr.com/\&quot;&gt;http://fuckyeahmath.tumblr.com/\&lt;/Hyperlink&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;LineBreak /&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;Hyperlink NavigateUri=&quot;/Views/SWBrowser.xaml/uri=http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png&quot;&gt;http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png&lt;/Hyperlink&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;LineBreak /&gt;&lt;Run Text=&quot;Come and see Mother's &amp;quot;Day&amp;quot; featuring The Girl in the Picture Tries to Hang up the Phone!&quot; /&gt;&lt;/Paragraph&gt;&lt;/Section&gt;">
+			<SwipperPlus_Model_Twitter:SWTwitterFeed.TweetedUser>
+				<SwipperPlus_Model_Twitter:SWTwitterUser DisplayName="Draco Li"/>
+			</SwipperPlus_Model_Twitter:SWTwitterFeed.TweetedUser>
+			<SwipperPlus_Model_Twitter:SWTwitterFeed.OriginalUser>
+				<SwipperPlus_Model_Twitter:SWTwitterUser DisplayName="Draco Li"/>
+			</SwipperPlus_Model_Twitter:SWTwitterFeed.OriginalUser>
+			<SwipperPlus_Model_Twitter:SWTwitterFeed.Urls>
+				<TweetSharp:TwitterUrl EndIndex="49" EntityType="Media" ExpandedValue="Bibendum amet vestibulum adipiscing" StartIndex="84" Value="Dictumst fusce"/>
+				<TweetSharp:TwitterUrl EndIndex="71" EntityType="Url" ExpandedValue="Convallis dignissim ante nam" StartIndex="30" Value="Parturient eleifend facilisi"/>
+				<TweetSharp:TwitterUrl EndIndex="62" EntityType="Media" ExpandedValue="Mauris elementum" StartIndex="39" Value="Vestibulum facilisis"/>
+				<TweetSharp:TwitterUrl EndIndex="14" EntityType="Url" ExpandedValue="Aliquam fermentum fringilla arcu lorem" StartIndex="31" Value="Habitasse faucibus"/>
+				<TweetSharp:TwitterUrl EndIndex="83" EntityType="Url" ExpandedValue="Sed integer" StartIndex="21" Value="Dis habitant"/>
+			</SwipperPlus_Model_Twitter:SWTwitterFeed.Urls>
+		</SwipperPlus_Model_Twitter:SWTwitterFeed>
+		<SwipperPlus_Model_Twitter:SWTwitterFeed Date="04/22/2012 14:38:46" IsRetweet="True" 
+																						 Message="Time for your week in entertainment with Jessica Chobot! http://youtu.be/L-ysuo68HJk" TwitterDate="5h"
+																						 XmlMessage="&lt;Section xml:space=&quot;preserve&quot; HasTrailingParagraphBreakOnPaste=&quot;False&quot; xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;&gt;&lt;Paragraph FontSize=&quot;20&quot; FontFamily=&quot;Segoe WP&quot; Foreground=&quot;#FFFFFFFF&quot; FontWeight=&quot;Normal&quot; FontStyle=&quot;Normal&quot; FontStretch=&quot;Normal&quot; TextAlignment=&quot;Left&quot;&gt;&lt;Run Text=&quot;Time for your week in entertainment with Jessica Chobot! &quot; /&gt;&lt;Hyperlink NavigateUri=&quot;/Views/SWBrowser.xaml/uri=http://youtu.be/L-ysuo68HJk&quot;&gt;http://youtu.be/L-ysuo68HJk&lt;/Hyperlink&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;/Paragraph&gt;&lt;/Section&gt;">
+			<SwipperPlus_Model_Twitter:SWTwitterFeed.OriginalUser>
+				<SwipperPlus_Model_Twitter:SWTwitterUser DisplayName="J. Bradford DeLong"/>
+			</SwipperPlus_Model_Twitter:SWTwitterFeed.OriginalUser>
+			<SwipperPlus_Model_Twitter:SWTwitterFeed.TweetedUser>
+				<SwipperPlus_Model_Twitter:SWTwitterUser DisplayName="Joshua Gans"/>
+			</SwipperPlus_Model_Twitter:SWTwitterFeed.TweetedUser>
+			<SwipperPlus_Model_Twitter:SWTwitterFeed.Urls>
+				<TweetSharp:TwitterUrl EndIndex="25" EntityType="Mention" ExpandedValue="Mus nulla eget adipiscing elit" StartIndex="57" Value="Aliquet interdum blandit malesuada nullam"/>
+				<TweetSharp:TwitterUrl EndIndex="97" EntityType="Media" ExpandedValue="Nec aptent commodo auctor" StartIndex="20" Value="Congue cursus proin penatibus non"/>
+				<TweetSharp:TwitterUrl EndIndex="92" EntityType="HashTag" ExpandedValue="Enim erat porttitor eros parturient" StartIndex="98" Value="Tincidunt vestibulum conubia vestibulum nibh"/>
+				<TweetSharp:TwitterUrl EndIndex="73" EntityType="Mention" ExpandedValue="Nisi augue lobortis" StartIndex="90" Value="Nisl dictum nunc per cubilia"/>
+				<TweetSharp:TwitterUrl EndIndex="89" EntityType="Url" ExpandedValue="Nascetur adipiscing" StartIndex="80" Value="Sed dolor odio fames"/>
+			</SwipperPlus_Model_Twitter:SWTwitterFeed.Urls>
+		</SwipperPlus_Model_Twitter:SWTwitterFeed>
+	</SwipperPlus_ViewModel:SWTwitterManager.Feeds>
+</SwipperPlus_ViewModel:SWTwitterManager>

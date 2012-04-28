@@ -1,21 +1,28 @@
 ﻿using System;
 using System.Net;
 using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
+using System.Collections.ObjectModel;
 using TweetSharp;
 using Codeplex.OAuth;
-using SwipperPlus.Model;
-using SwipperPlus.Settings;
+using SwipperPlus.Model.Twitter;
 using SwipperPlus.Utils;
+using SwipperPlus.Utils.Parsers;
+using SwipperPlus.Model.Facebook;
+using SwipperPlus.Settings;
 
-namespace SwipperPlus.Model
+namespace SwipperPlus.ViewModel
 {
   /**
    * Connects app with Twitter if user authenticated
    */
   public class SWTwitterManager : SWSocialLinkManager
   {
-    public List<TwitterStatus> Feeds { private set; get; }
+    public ObservableCollection<SWTwitterFeed> Feeds { private set; get; }
+
+    public override string Title
+    {
+      get { return "Twitter"; }
+    }
 
     private TwitterService twitter;
 
@@ -26,38 +33,35 @@ namespace SwipperPlus.Model
       twitter.AuthenticateWith(token.Key, token.Secret);
     }
 
-    public static bool IsConnected()
-    {
-      return SWTwitterSettings.IsConnected();
-    }
-
     /// <summary>
     /// Get new feeds from Twitter and parses the result
     /// </summary>
     public override void FetchFeeds()
     {
-      Feeds = new List<TwitterStatus>();
-      this.twitter.ListTweetsOnHomeTimeline(GeneralSettings.FeedsToGet, tw_HandleCallback);
+      Feeds = new ObservableCollection<SWTwitterFeed>();
+      twitter.ListTweetsOnHomeTimeline(GeneralSettings.FeedsToGet, tw_HandleCallback);
     }
 
     public override void UpdateFeeds()
     {
-      this.twitter.ListTweetsOnHomeTimelineSince(Feeds[0].Id, tw_HandleCallback);
+      twitter.ListTweetsOnHomeTimelineSince(Feeds[0].ID, tw_HandleCallback);
     }
 
     public override void SaveFeeds()
     {
-      throw new NotImplementedException();
+      
     }
 
     public override bool HaveSavedFeeds()
     {
-      throw new NotImplementedException();
+      bool result = false;
+
+      return result;
     }
 
     public override void LoadSavedFeeds()
     {
-      throw new NotImplementedException();
+      
     }
 
     private void tw_HandleCallback(IEnumerable<TwitterStatus> statuses, TwitterResponse response)
@@ -65,15 +69,23 @@ namespace SwipperPlus.Model
       if (response.StatusCode == HttpStatusCode.OK)
       {
         // Determine feed status
-        FeedStatus status = Feeds.Count == 0 ? FeedStatus.New : FeedStatus.Updated;
+        FeedStatus status = FeedStatus.New;
+        ObservableCollection<SWTwitterFeed> oldFeeds = null;
+        if (Feeds.Count != 0)
+        {
+          status = FeedStatus.Updated;
+          oldFeeds = Feeds;
+          Feeds = new ObservableCollection<SWTwitterFeed>();
+        }
 
         // Save retrieved twitter feeds
-        List<TwitterStatus> tempFeeds = new List<TwitterStatus>();
         foreach (TwitterStatus tweet in statuses)
-          tempFeeds.Add(tweet);
+          Feeds.Add(TwitterParser.ParseTweet(tweet));
 
-        // Add new feeds to top of list
-        Feeds.InsertRange(0, tempFeeds);
+        // Add in the old feeds if its an update
+        if (oldFeeds != null)
+          foreach (SWTwitterFeed st in oldFeeds)
+            Feeds.Add(st);
 
         OnRaiseFeedsEvent(new SocialLinkEventArgs(status));
       }

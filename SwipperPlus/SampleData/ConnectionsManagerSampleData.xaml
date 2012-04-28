@@ -1,7 +1,9 @@
-<SwipperPlus_ViewModels:ConnectionsManager xmlns:SwipperPlus_ViewModels="clr-namespace:SwipperPlus.ViewModels">
-	<SwipperPlus_ViewModels:ConnectionsManager.Connections>
-		<SwipperPlus_ViewModels:Connection IsConnected="False" IsEnabled="False" Name="Facebook"/>
-		<SwipperPlus_ViewModels:Connection IsConnected="True" IsEnabled="False" Name="Twitter"/>
-		<SwipperPlus_ViewModels:Connection IsConnected="True" IsEnabled="True" Name="LinkedIn"/>
-	</SwipperPlus_ViewModels:ConnectionsManager.Connections>
-</SwipperPlus_ViewModels:ConnectionsManager>
+<ViewModels:ConnectionsManager 
+  xmlns:ViewModels="clr-namespace:SwipperPlus.ViewModel"
+  xmlns:Models="clr-namespace:SwipperPlus.Model">
+  <ViewModels:ConnectionsManager.Connections>
+    <Models:Connection IsConnected="False" DisplayName="Facebook"/>
+    <Models:Connection IsConnected="True" DisplayName="Twitter"/>
+    <Models:Connection IsConnected="True" DisplayName="LinkedIn"/>
+  </ViewModels:ConnectionsManager.Connections>
+</ViewModels:ConnectionsManager>

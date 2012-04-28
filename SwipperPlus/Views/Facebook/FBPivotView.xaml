@@ -1,12 +1,11 @@
 ﻿<phone:PhoneApplicationPage 
-    x:Class="SwipperPlus.Views.AuthBrowser"
+    x:Class="SwipperPlus.Views.Facebook.FBPivotView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
@@ -21,18 +20,14 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!--ContentPanel - place additional content here-->
-      <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-      <Grid.RowDefinitions>
-        <RowDefinition Height="*"/>
-      </Grid.RowDefinitions>
-        <phone:WebBrowser Height="Auto" x:Name="authBrowser" IsScriptEnabled="True" Navigating="authBrowser_Navigating" LoadCompleted="authBrowser_LoadCompleted" Visibility="Visible" Grid.Row="0"/>
-        <StackPanel Name="loadingView" VerticalAlignment="Top" Background="{StaticResource PhoneBackgroundBrush}" Grid.Row="0">
-          <toolkit:PerformanceProgressBar x:Name="progressBar" IsIndeterminate="False" Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top" />
-          <TextBlock Name="loadingText" Text="Loading Website..." Foreground="{StaticResource PhoneContrastBackgroundBrush}" VerticalAlignment="Bottom" TextAlignment="Left" FontSize="18" />
+        <!--TitlePanel contains the name of the application and page title-->
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
+            <TextBlock x:Name="ApplicationTitle" Text="MY APPLICATION" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock x:Name="PageTitle" Text="page name" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
-        
-      </Grid>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0"></Grid>
     </Grid>
  
     <!--Sample code showing usage of ApplicationBar-->

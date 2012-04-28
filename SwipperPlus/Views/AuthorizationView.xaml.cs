@@ -13,7 +13,10 @@ using Facebook;
 using TweetSharp;
 using Codeplex.OAuth;
 using SwipperPlus.Model;
+using SwipperPlus.ViewModel;
 using SwipperPlus.Settings;
+using SwipperPlus.Utils;
+using SwipperPlus.Utils.Parsers;
 
 namespace SwipperPlus.Views
 {
@@ -22,6 +25,17 @@ namespace SwipperPlus.Views
     public AuthorizationView()
     {
       InitializeComponent();
+      /*
+       <Section xml:space="preserve" HasTrailingParagraphBreakOnPaste="False" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Paragraph FontSize="20" FontFamily="Segoe WP" Foreground="#FFFFFFFF" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" TextAlignment="Left"><Run Text="Hey Nerds, BATMAN PHSYSICS via " /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://fuckyeahmath.tumblr.com/\>http://fuckyeahmath.tumblr.com/\</HyperLink><Run Text="" /><LineBreak /><Run Text="" /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png>http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png</HyperLink><Run Text="" /><LineBre'
+       */
+      string str = RichTextBoxParser.ParseStringToRichTextBox(@"Time for your week in entertainment with Jessica Chobot! http://youtu.be/L-ysuo68HJk");
+      System.Diagnostics.Debug.WriteLine(str);
+
+      if (SWTwitterSettings.IsConnected())
+      {
+        SWTwitterManager tm = new SWTwitterManager();
+        tm.FetchFeeds();
+      }
     }
 
     /// <summary>
@@ -34,8 +48,16 @@ namespace SwipperPlus.Views
     {
       base.OnNavigatedTo(e);
 
-      if (DataContext == null)
-        InitializePageState();
+      // Refresh data context since user could have authorized something
+      InitializePageState();
+
+      // Check if we just enabled a link
+      if (PhoneApplicationService.Current.State.ContainsKey(Constants.AUTH_NOTIFICATION))
+      {
+        string notification = (string)PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION];
+        PhoneApplicationService.Current.State.Remove(Constants.AUTH_NOTIFICATION);
+        showNotification(notification);
+      }
     }
 
     protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -48,82 +70,77 @@ namespace SwipperPlus.Views
     /// </summary>
     private void InitializePageState()
     {
+      // Update all our social link content
       DataContext = new ConnectionsManager();
     }
 
-    private void AuthorizeConnection(object sender, RoutedEventArgs e)
+    #region Authentication/Deauthentication
+    
+    /// <summary>
+    /// Handles the authorization and deauthorization of links
+    /// </summary>
+    private void ConnectButtonPressed(object sender, RoutedEventArgs e)
     {
+      // Handle this command
       Connection c = (sender as Button).DataContext as Connection;
-      string name = c.Name;
-      if (name.Equals("Facebook"))
-        fb_connection();
-      else if (name.Equals("Twitter"))
-        tw_connection();
-      else if (name.Equals("LinkedIn"))
-        li_connection();
-    }
-
-    /// <summary>
-    /// Open facebook auth page
-    /// </summary>
-    private void fb_connection()
-    {
-      // Open facebook auth url
-      FacebookOAuthClient oauth = new FacebookOAuthClient();
-      Uri loginUrl = oauth.GetLoginUrl(SWFacebookSettings.GetLoginParameters());
-      navigateToUri(loginUrl.ToString());
-    }
-
-    /// <summary>
-    /// Open twitter auth page
-    /// </summary>
-    private void tw_connection()
-    {
-      TwitterService twService = new TwitterService(SWTwitterSettings.ConsumerKey, 
-        SWTwitterSettings.ConsumerSecret);
-      twService.GetRequestToken((token, response) =>
+      if (c.IsConnected)
       {
-        // Handle errors
-        if (token == null)
+        // Deauthorize the connection if user confirms
+        string name = c.Name;
+        MessageBoxResult r = MessageBox.Show("Remove " + name + " from the application?", 
+          "Disconnect " + name, MessageBoxButton.OKCancel);
+        if (r == MessageBoxResult.OK)
         {
-          Deployment.Current.Dispatcher.BeginInvoke(() => { 
-            DisplayError("Cannot request twitter token." + Environment.NewLine + "Please check your internet");
-          });
-          System.Diagnostics.Debug.WriteLine(response.Response);
-          return;
+          deauthorizeConnection(c);
         }
-        // Save temp request token for getting access token
-        PhoneApplicationService.Current.State[Constants.TW_TOKEN] = token; // Save our twitter token
-
-        // Navigate to auth page
-        Uri uri = twService.GetAuthenticationUrl(token);
-        Deployment.Current.Dispatcher.BeginInvoke(() =>
-        {
-          System.Diagnostics.Debug.WriteLine(uri.ToString());
-          navigateToUri(uri.ToString());
-        });
-      });
+      }
+      else
+      {
+        authorizeConnection(c);
+      }
+    }
+    
+    /// <summary>
+    /// Authorize a connection
+    /// </summary>
+    private void authorizeConnection(Connection c)
+    {
+      // Authorize this connection
+      authenticateLink(c.Name);
     }
 
     /// <summary>
-    /// Open linkedin auth page
+    /// Deauthorize a connection
     /// </summary>
-    private void li_connection()
+    private void deauthorizeConnection(Connection c)
     {
-      // Get linkedin authorization url for app
-      var authorizer = new OAuthAuthorizer(SWLinkedInSettings.ConsumerKey, SWLinkedInSettings.ConsumerSecret);
-      authorizer.GetRequestToken(SWLinkedInSettings.RequestTokenUri)
-        .Select(res => res.Token)
-        .ObserveOnDispatcher()
-        .Subscribe(token =>
-        {
-          // Save temp request token for getting access token
-          PhoneApplicationService.Current.State[Constants.LI_TOKEN] = token;
+      // Manually set isconnected to false to update UI and settings
+      c.IsConnected = false;
+    }
 
-          //linkedInRequestToken = token;
-          string uri = authorizer.BuildAuthorizeUrl(SWLinkedInSettings.AuthorizeUri, token);
-          navigateToUri(uri);
-        });
+    /// <summary>
+    /// Open our authorization browser for the requested link
+    /// </summary>
+    /// <param name="type">The type of the authentication</param>
+    private void authenticateLink(string type)
+    {
+      // Open our authbrowser passing in only the social link we need to authorize
+      string uri = "//Views/AuthBrowser.xaml?" + Constants.AUTH_LINK + "=" + type;
+      NavigationService.Navigate(new Uri(uri, UriKind.Relative));
+    }
+    
+    #endregion
+
+    #region Notifications and Errors
+
+    /// <summary>
+    /// Displays the notification panel with supplied text
+    /// </summary>
+    /// <param name="text">Text to display</param>
+    private void showNotification(string text, double sec = 1)
+    {
+      NotificationText.Text = text;
+      NotificationAnimateInOut.Begin();
     }
 
     /// <summary>
@@ -131,37 +148,24 @@ namespace SwipperPlus.Views
     /// </summary>
     /// <param name="errors">A list of errors messages</param>
     /// <param name="caption">The caption</param>
-    private void DisplayError(List<string> errors, string caption = null)
+    private void displayError(List<string> errors, string caption = null)
     {
-      MessageBox.Show(string.Join(Environment.NewLine, errors), caption, MessageBoxButton.OK);
+      if (caption != null)
+        MessageBox.Show(string.Join(Environment.NewLine, errors), caption, MessageBoxButton.OK);
+      else
+        MessageBox.Show(string.Join(Environment.NewLine, errors));
     }
 
     /// <summary>
     /// Overloaded method for displaying only one error
     /// </summary>
-    private void DisplayError(string error, string caption = null)
+    private void displayError(string error, string caption = null)
     {
       List<string> errors = new List<string>();
       errors.Add(error);
-      DisplayError(errors, caption);
+      displayError(errors, caption);
     }
 
-    /// <summary>
-    /// Open our authorization browser to the authorization uri
-    /// </summary>
-    /// <param name="uri">The authorization uri</param>
-    private void navigateToUri(string uri, Dictionary<string, string> pms = null)
-    {
-      // Construct our url
-      string link = "//Views/AuthBrowser.xaml?uri=" + uri;
-      if (pms != null)
-      {
-        foreach (KeyValuePair<string, string> pair in pms)
-          link += "&" + pair.Key + "=" + pair.Value;
-      }
-
-      // Open our authbrowser passing in only the auth page uri
-      NavigationService.Navigate(new Uri(link, UriKind.Relative));
-    }
+    #endregion
   }
 }

@@ -6,13 +6,13 @@ using SwipperPlus.Utils;
 namespace SwipperPlus.Model.Facebook
 {
   /// <summary>
-  /// Represents a person
+  /// Represents a Facebook person
   /// </summary>
   public class FacebookUser
   {
-    public UInt64 ID;
-    public string Name;
-    public Uri Icon;
+    public UInt64 ID { set; get; }
+    public string DisplayName { set; get; }
+    public Uri Icon { set; get; }
 
     public FacebookUser(UInt64 id)
     {
@@ -22,7 +22,7 @@ namespace SwipperPlus.Model.Facebook
     public FacebookUser(UInt64 id, string name, Uri icon)
     {
       ID = id;
-      Name = name;
+      DisplayName = name;
       Icon = icon;
     }
   }

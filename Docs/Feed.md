@@ -1,4 +1,4 @@
-#Feed
+#FacebookFeed
 
 All data related to feeds is all handled through the ```Feed``` class under the Models folder.
 Since we are converting JSON into Feed objects, I have opt not to create a number of classes that inherits from the Feed model since that will complicate code alot. Instead all information is under the main ```Feed``` class and if a feed does not have a certain information, that field is set to ```null``` or ```0``` depending on the type of the field.
@@ -49,7 +49,7 @@ Currently the class contains information regarding the href of the attachment, t
 ### FacebookItem
 This class contains information regarding the likes and the comments. For likes, we also record the IDs of your friends who have liked this item. For comments we record few preview comments since Facebook did not provide the whole comment list for each feed. For the whole comment list, a separate request must be issued.
 
-### Person
+### FacebookPerson
 The ```Person``` class contain some sparse information regarding a Person. Right now we record the ID, the name, the type (Facebook, Twitter, etc), and the icon of the person.
 Since the ```Person``` class is used a lot by the ```Feeds``` class we store the core Person object in a People Dictionary identified by the Person's ID. The static People Dictionary is thus persisted and is not related to the Feeds.
 A distinction is made between People from different SocialLinks. Thus we have a ```People``` class that contains a static Dictionary for each of the People in these different SocialLinks. To find a person, all we need is the type (Facebook, Twitter, etc) and the ID of the individual.

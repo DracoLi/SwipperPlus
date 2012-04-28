@@ -61,6 +61,7 @@
       <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\ICSharpCode.SharpZipLib.WindowsPhone.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Phone" />
+    <Reference Include="Microsoft.Phone.Controls, Version=7.0.0.0, Culture=neutral, PublicKeyToken=24eec0d8c86cda1e, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Phone.Controls.Toolkit, Version=7.0.0.0, Culture=neutral, PublicKeyToken=b772ad94eb9ca604, processorArchitecture=MSIL">
       <HintPath>..\packages\SilverlightToolkitWP.4.2011.12.14\lib\sl4-windowsphone71\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
     </Reference>
@@ -69,16 +70,21 @@
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="PhonePerformance">
+      <HintPath>..\packages\PhonePerformance.1.2.1\lib\sl4-windowsphone71\PhonePerformance.dll</HintPath>
+    </Reference>
     <Reference Include="ReactiveOAuth.WP7">
       <HintPath>..\packages\ReactiveOAuth-WP7.0.4.0.0\lib\ReactiveOAuth.WP7.dll</HintPath>
     </Reference>
     <Reference Include="System.Observable" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
     <Reference Include="System.Xml" />
     <Reference Include="mscorlib.extensions" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="TweetSharp.WindowsPhone.Mango">
       <HintPath>..\packages\TweetSharp.2.1.4\lib\sl4-wp71\TweetSharp.WindowsPhone.Mango.dll</HintPath>
     </Reference>
@@ -88,18 +94,27 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Constants.cs" />
-    <Compile Include="Models\Connection.cs" />
-    <Compile Include="Models\Facebook\FacebookComment.cs" />
-    <Compile Include="Models\Facebook\FacebookAttachment.cs" />
-    <Compile Include="Models\Facebook\FacebookItem.cs" />
-    <Compile Include="Models\Facebook\FacebookUser.cs" />
-    <Compile Include="Models\Facebook\FacebookFeed.cs" />
-    <Compile Include="Models\LinkedIn\LinkedInFeed.cs" />
-    <Compile Include="Models\LinkedIn\LinkedInUser.cs" />
+    <Compile Include="Controls\PlaceImage.cs" />
+    <Compile Include="Controls\SWRichTextBox.xaml.cs">
+      <DependentUpon>SWRichTextBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Model\Connection.cs" />
+    <Compile Include="Model\Facebook\FacebookComment.cs" />
+    <Compile Include="Model\Facebook\FacebookAttachment.cs" />
+    <Compile Include="Model\Facebook\FacebookItem.cs" />
+    <Compile Include="Model\Facebook\FacebookUser.cs" />
+    <Compile Include="Model\Facebook\FacebookFeed.cs" />
+    <Compile Include="Model\LinkedIn\LinkedInFeed.cs" />
+    <Compile Include="Model\LinkedIn\LinkedInUser.cs" />
+    <Compile Include="Model\SWToken.cs" />
+    <Compile Include="Model\Twitter\SWTwitterAttachment.cs" />
+    <Compile Include="Model\Twitter\SWTwitterFeed.cs" />
+    <Compile Include="Model\Twitter\SWTwitterUser.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\SWLinkedInSettings.cs" />
     <Compile Include="Settings\SWTwitterSettings.cs" />
     <Compile Include="Utils\Converters\BoolConverters.cs" />
+    <Compile Include="Utils\Converters\TimeConverters.cs" />
     <Compile Include="Utils\Parsers\FacebookParser.cs" />
     <Compile Include="Utils\GeneralUtils.cs" />
     <Compile Include="Settings\SWFacebookSettings.cs" />
@@ -108,6 +123,8 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Parsers\LinkedInParser.cs" />
+    <Compile Include="Utils\Parsers\RichTextBoxParser.cs" />
+    <Compile Include="Utils\Parsers\TwitterParser.cs" />
     <Compile Include="Utils\StorageUtils.cs" />
     <Compile Include="ViewModels\ConnectionManager.cs" />
     <Compile Include="ViewModels\SWFacebookManager.cs" />
@@ -120,12 +137,22 @@
     <Compile Include="Views\AuthBrowser.xaml.cs">
       <DependentUpon>AuthBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Facebook\FBPivotView.xaml.cs">
+      <DependentUpon>FBPivotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Twitter\TWPivotView.xaml.cs">
+      <DependentUpon>TWPivotView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Page Include="Controls\SWRichTextBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -135,6 +162,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\AuthBrowser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Facebook\FBPivotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Twitter\TWPivotView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -153,6 +188,7 @@
     <Content Include="Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\y_normal.png" />
     <Content Include="SplashScreenImage.jpg" />
     <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
     <Content Include="Toolkit.Content\ApplicationBar.Check.png" />
@@ -160,15 +196,16 @@
     <Content Include="Toolkit.Content\ApplicationBar.Select.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Views\Facebook\" />
     <Folder Include="Views\LinkedIn\" />
-    <Folder Include="Views\Twitter\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
     <DesignData Include="SampleData\ConnectionsManagerSampleData.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </DesignData>
+    <DesignData Include="SampleData\SWTwitterManagerSampleData.xaml">
       <Generator>MSBuild:MarkupCompilePass1</Generator>
     </DesignData>
   </ItemGroup>

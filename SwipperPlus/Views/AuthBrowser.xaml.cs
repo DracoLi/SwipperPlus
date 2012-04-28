@@ -11,6 +11,7 @@ using TweetSharp;
 using Codeplex.OAuth;
 using SwipperPlus.Settings;
 using SwipperPlus.Utils;
+using SwipperPlus.Model;
 
 namespace SwipperPlus.Views
 {
@@ -28,24 +29,127 @@ namespace SwipperPlus.Views
     {
       base.OnNavigatedTo(e);
 
-      string uri = "";
-      if (NavigationContext.QueryString.TryGetValue("uri", out uri))
+      // Hide auth browser until we are loading
+      authBrowser.Visibility = Visibility.Collapsed;
+      
+      // Figure out what we need to authorize
+      if (NavigationContext.QueryString.ContainsKey(Constants.AUTH_LINK))
       {
-        this.authBrowser.Navigate(new Uri(uri));
+        showLoadingView();
+        string type = NavigationContext.QueryString[Constants.AUTH_LINK];
+
+        // We need internet connect from everything here. Check that please!
+        if (!GeneralUtils.HasInternetConnection())
+        {
+          displayErrorAndGoBack(type +" cannot be authorized." + Environment.NewLine +
+            "Please check you internet connection and try again", "No Internet Connection");
+          return;
+        }
+
+        // Handle social link authorization
+        if (type.Equals(Constants.FACEBOOK))
+          fb_connection();
+        else if (type.Equals(Constants.TWITTER))
+          tw_connection();
+        else if (type.Equals(Constants.LINKEDIN))
+          li_connection();
+        else
+          showGenericErrorAndGoBack();
+      }
+      else
+      {
+        showGenericErrorAndGoBack();
       }
     }
+ 
+    #region Prepare authorization page
+
+    // Temp vars to store request tokens
+    private OAuthRequestToken tw_requestToken;
+    private RequestToken      li_requestToken;
+
+    /// <summary>
+    /// Open facebook auth page
+    /// </summary>
+    private void fb_connection()
+    {
+      // Open facebook auth url
+      FacebookOAuthClient oauth = new FacebookOAuthClient();
+      Uri loginUrl = oauth.GetLoginUrl(SWFacebookSettings.GetLoginParameters());
+      authBrowser.Navigate(loginUrl);
+    }
+
+    /// <summary>
+    /// Open twitter auth page
+    /// </summary>
+    private void tw_connection()
+    {
+      TwitterService twService = new TwitterService(SWTwitterSettings.ConsumerKey,
+        SWTwitterSettings.ConsumerSecret);
+      twService.GetRequestToken((token, response) =>
+      {
+        // Handle errors
+        if (token == null)
+        {
+          Deployment.Current.Dispatcher.BeginInvoke(() =>
+          {
+            displayErrorAndGoBack("Cannot authorize Twitter." + Environment.NewLine 
+              + "Please check your internet");
+          });
+          System.Diagnostics.Debug.WriteLine(response.Response);
+          return;
+        }
+
+        // Save request token
+        this.tw_requestToken = token;
+
+        // Navigate to auth page
+        Uri uri = twService.GetAuthenticationUrl(token);
+        Deployment.Current.Dispatcher.BeginInvoke(() =>
+        {
+          System.Diagnostics.Debug.WriteLine(uri.ToString());
+          authBrowser.Navigate(uri);
+        });
+      });
+    }
+
+    /// <summary>
+    /// Open linkedin auth page
+    /// </summary>
+    private void li_connection()
+    {
+      // Get linkedin authorization url for app
+      var authorizer = new OAuthAuthorizer(SWLinkedInSettings.ConsumerKey, SWLinkedInSettings.ConsumerSecret);
+      authorizer.GetRequestToken(SWLinkedInSettings.RequestTokenUri)
+      .Select(res => res.Token)
+      .ObserveOnDispatcher()
+      .Subscribe(token =>
+      {
+        // Save request token
+        this.li_requestToken = token;
+
+        //linkedInRequestToken = token;
+        string uri = authorizer.BuildAuthorizeUrl(SWLinkedInSettings.AuthorizeUri, token);
+        authBrowser.Navigate(new Uri(uri));
+      });
+    }
+
+    #endregion
 
     private void authBrowser_Navigating(object sender, NavigatingEventArgs e)
     {
       showLoadingView();
+      authBrowser.Visibility = Visibility.Visible;
 
-      #region Facebook authorizatoin
+      #region Facebook authorization
       FacebookOAuthResult rs;
       if (FacebookOAuthResult.TryParse(e.Uri, out rs))
       {
         if (rs.IsSuccess)
         {
           SWFacebookSettings.SetAccessToken(rs.AccessToken);
+          System.Diagnostics.Debug.WriteLine("Facebook access token: " + rs.AccessToken);
+          PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION] = "Facebook is now enabled!";
           goBack();
           // TODO: Notify UI facebook is authenticated now
         }
@@ -74,15 +178,19 @@ namespace SwipperPlus.Views
         e.Cancel = true;
         return;
       }
-
-      // TODO: show loading view
     }
 
     private void authBrowser_LoadCompleted(object sender, NavigationEventArgs e)
     {
+      // Hide loading view when page is loaded
       hideLoadingView();
     }
 
+    #region Page authorization (Access Tokens)
+    
+    /// <summary>
+    /// Get Twitter's access token from auth uri
+    /// </summary>
     private void handleTwitterAuthorization(Uri uri)
     {
       // Get the verifier from the redirected url and get access token
@@ -95,40 +203,39 @@ namespace SwipperPlus.Views
         return;
       }
 
-      // If have verifier, we get accesstoken
-      string verifyPin = results["oauth_verifier"];
-      TwitterService twService = new TwitterService(SWTwitterSettings.ConsumerKey,
-        SWTwitterSettings.ConsumerSecret);
-      OAuthRequestToken twRequestToken = (OAuthRequestToken)PhoneApplicationService.Current.State[Constants.TW_TOKEN];
-
       // Handle no twitter request token
-      if (twRequestToken == null)
+      if (this.tw_requestToken == null)
       {
         twFailedAndGoBack();
         return;
       }
 
-      // cleanup
-      PhoneApplicationService.Current.State.Remove(Constants.TW_TOKEN);
-
       // Get twitter access token
-      twService.GetAccessToken(twRequestToken, verifyPin, (token, response) =>
+      string verifyPin = results["oauth_verifier"];
+      TwitterService twService = new TwitterService(SWTwitterSettings.ConsumerKey,
+        SWTwitterSettings.ConsumerSecret);
+      twService.GetAccessToken(this.tw_requestToken, verifyPin, (token, response) =>
       {
         if (token == null)
         {
           // Handle when we did not receice a token;
-          twFailedAndGoBack();
+          Deployment.Current.Dispatcher.BeginInvoke(() => { twFailedAndGoBack(); });
           return;
         }
 
         // Now that we got the access token, we can save the tokens
         SWTwitterSettings.SetAccessToken(new AccessToken(token.Token, token.TokenSecret));
-        goBack();
+        System.Diagnostics.Debug.WriteLine("Twitter access token: " + token.Token);
+        PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION] = "Twitter is now enabled!";
+        Deployment.Current.Dispatcher.BeginInvoke(() => { goBack(); });
 
         // TODO: Let UI know twitter is authenticated now
       });
     }
 
+    /// <summary>
+    /// Get linkedin access token from uri
+    /// </summary>
     private void handleLinkedInAuthorization(Uri uri)
     {
       var results = GeneralUtils.GetQueryParameters(uri);
@@ -140,22 +247,20 @@ namespace SwipperPlus.Views
         return;
       }
 
-      string verifyPin = results["oauth_verifier"];
-      var authorizer = new OAuthAuthorizer(SWLinkedInSettings.ConsumerKey, SWLinkedInSettings.ConsumerSecret);
-      RequestToken liRequestToken = (RequestToken)PhoneApplicationService.Current.State[Constants.LI_TOKEN];
-
       // Handle no linkedin request token
-      if (liRequestToken == null)
+      if (li_requestToken == null)
       {
         liFailedAndGoBack();
         return;
       }
 
       // clean up
-      PhoneApplicationService.Current.State.Remove(Constants.LI_TOKEN);
+      StorageUtils.RemoveData(Constants.LI_TOKEN);
 
-      // Set access token
-      authorizer.GetAccessToken(SWLinkedInSettings.AccessTokenUri, liRequestToken, verifyPin)
+      // Get access token
+      string verifyPin = results["oauth_verifier"];
+      var authorizer = new OAuthAuthorizer(SWLinkedInSettings.ConsumerKey, SWLinkedInSettings.ConsumerSecret);
+      authorizer.GetAccessToken(SWLinkedInSettings.AccessTokenUri, this.li_requestToken, verifyPin)
         .ObserveOnDispatcher()
         .Subscribe(res =>
         {
@@ -166,12 +271,17 @@ namespace SwipperPlus.Views
           }
           SWLinkedInSettings.SetAccessToken(res.Token);
           System.Diagnostics.Debug.WriteLine("Successfully got linkedin access token: " + res.Token.ToString());
+          PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION] = "LinkedIn is now enabled!";
           goBack();
 
           // TODO: notify UI that linkedin is now connected
         });
     }
 
+    #endregion
+
+    #region UI Actions (goback, display messages, loading etc)
+    
     /// <summary>
     /// Displays an error message to the user and then go back to last page
     /// </summary>
@@ -179,7 +289,13 @@ namespace SwipperPlus.Views
     /// <param name="caption">The caption</param>
     private void displayErrorAndGoBack(List<string> errors, string caption = null)
     {
-      MessageBoxResult r = MessageBox.Show(string.Join(Environment.NewLine, errors), caption, MessageBoxButton.OK);
+      hideLoadingView();
+      MessageBoxResult r;
+      if (caption != null)
+        r = MessageBox.Show(string.Join(Environment.NewLine, errors), caption, MessageBoxButton.OK);
+      else
+        r = MessageBox.Show(string.Join(Environment.NewLine, errors));
+
       if (r == MessageBoxResult.OK)
         goBack();
     }
@@ -192,6 +308,12 @@ namespace SwipperPlus.Views
       List<string> errors = new List<string>();
       errors.Add(error);
       displayErrorAndGoBack(errors, caption);
+    }
+
+    private void showGenericErrorAndGoBack()
+    {
+      displayErrorAndGoBack("Error Reason Unknown." + Environment.NewLine + 
+        "Please try again later.", "Authorization Failed");
     }
 
     /// <summary>
@@ -234,5 +356,7 @@ namespace SwipperPlus.Views
       loadingView.Visibility = Visibility.Collapsed;
       progressBar.IsIndeterminate = false;
     }
+
+    #endregion
   }
 }

@@ -5,48 +5,71 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:views="clr-namespace:SwipperPlus.Views.Twitter"
     x:Class="SwipperPlus.MainPage"
-    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="696"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     shell:SystemTray.IsVisible="True">
- 
-    <phone:PhoneApplicationPage.ApplicationBar>
-        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
-            <shell:ApplicationBar.MenuItems>
-                <shell:ApplicationBarMenuItem Text="Accounts"/>
-                <shell:ApplicationBarMenuItem Text="Settings"/>
-            </shell:ApplicationBar.MenuItems>
-        </shell:ApplicationBar>
-    </phone:PhoneApplicationPage.ApplicationBar>
+
+  <phone:PhoneApplicationPage.ApplicationBar>
+    <shell:ApplicationBar IsVisible="False" IsMenuEnabled="True">
+      <shell:ApplicationBar.MenuItems>
+        <shell:ApplicationBarMenuItem Click="ShowAuthorizationView" Text="Accounts"/>
+        <shell:ApplicationBarMenuItem Click="ShowSettingsView" Text="Settings"/>
+      </shell:ApplicationBar.MenuItems>
+    </shell:ApplicationBar>
+  </phone:PhoneApplicationPage.ApplicationBar>
 
   <!--LayoutRoot is the root grid where all page content is placed-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+  <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
 
-        <!--TitlePanel contains the name of the application and page title-->
-        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock x:Name="PageTitle" Text="page name" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
-        </StackPanel>
+    <!--ContentPanel - place additional content here-->
+    <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+      
+      <!--Pivot Control-->
+      <controls:Pivot Title="Swipper+" Name="MainPivot">
+        <controls:PivotItem Header="Twitter">
+          <StackPanel>
+            <views:TWPivotView x:Name="TwitterView" HorizontalAlignment="Stretch" Height="600"/>
+          </StackPanel>
+        </controls:PivotItem>
+        <!--
+        <controls:PivotItem Header="first">
+          <ListBox x:Name="FirstListBox" Margin="0,0,-12,0" ItemsSource="{Binding Items}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Margin="0,0,0,17" Width="432" Height="78">
+                  <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
+                  <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Margin="12,-6,12,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </controls:PivotItem>
 
-        <!--ContentPanel - place additional content here-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-          <Button Content="Facebook" Height="113" HorizontalAlignment="Left" Margin="1,39,0,0" x:Name="button1" VerticalAlignment="Top" Width="161" Click="button1_Click" />
-          <Button Content="Get it" Height="115" HorizontalAlignment="Left" Margin="161,37,0,0" x:Name="button2" VerticalAlignment="Top" Width="134" Click="button2_Click" />
-          <Button Content="Twitter" Height="113" HorizontalAlignment="Left" Margin="15,195,0,0" x:Name="button3" VerticalAlignment="Top" Width="147" Click="button3_Click" />
-          <Button Content="Get it" Height="115" HorizontalAlignment="Left" Margin="161,195,0,0" x:Name="button4" VerticalAlignment="Top" Width="135" Click="button4_Click" />
-          <Button Content="LinkedIn" Height="113" HorizontalAlignment="Left" Margin="15,355,0,0" x:Name="button5" VerticalAlignment="Top" Width="147" Click="button5_Click"/>
-          <Button Content="Get it" Height="115" HorizontalAlignment="Left" Margin="162,353,0,0" x:Name="button6" VerticalAlignment="Top" Width="134" Click="button6_Click" />
-          <Button Content="Update" Height="115" HorizontalAlignment="Left" Margin="303,37,0,0" Name="button7" VerticalAlignment="Top" Width="134" Click="facebookUpdate_Click" />
-      <Button Content="Get it" Height="115" HorizontalAlignment="Left" Margin="303,195,0,0" Name="button8" VerticalAlignment="Top" Width="134" Click="twitterUpdate_Click" />
-          <Button Content="Update" Height="115" HorizontalAlignment="Left" Margin="302,355,0,0" Name="button9" VerticalAlignment="Top" Width="135" Click="linkedIn_Click" />
-          <phone:WebBrowser Margin="0,3,0,1" ScrollViewer.VerticalScrollBarVisibility="Visible" Height="Auto" x:Name="authBrowser" IsScriptEnabled="True" Navigating="authBrowser_Navigating" Navigated="authBrowser_Navigated" LoadCompleted="authBrowser_LoadCompleted" Visibility="Collapsed"/>
-        </Grid>
+        <controls:PivotItem Header="second">
+          <ListBox x:Name="SecondListBox" Margin="0,0,-12,0" ItemsSource="{Binding Items}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Margin="0,0,0,17">
+                  <TextBlock Text="{Binding LineOne}" TextWrapping="NoWrap" Margin="12,0,0,0" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
+                  <TextBlock Text="{Binding LineThree}" TextWrapping="NoWrap" Margin="12,-6,0,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </controls:PivotItem>
+        -->
+      </controls:Pivot>
     </Grid>
+  </Grid>
 
 </phone:PhoneApplicationPage>

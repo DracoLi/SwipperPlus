@@ -10,263 +10,69 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Phone.Controls;
-using Facebook;
-using SwipperPlus.Model;
-using SwipperPlus.Settings;
-using TweetSharp;
-using SwipperPlus.Utils;
 using Codeplex.OAuth;
 using Microsoft.Phone.Reactive;
+using Facebook;
+using TweetSharp;
+using SwipperPlus.ViewModel;
+using SwipperPlus.Settings;
+using SwipperPlus.Utils;
 
 namespace SwipperPlus
 {
   public partial class MainPage : PhoneApplicationPage
   {
+    SWTwitterManager twManager;
+    SWLinkedInManager liManager;
+    SWFacebookManager fbManager;
 
-    private TwitterService twService;
-    private OAuthRequestToken twRequestToken;
-    private SWFacebookManager facebookManager;
-    private SWTwitterManager twitterManager;
-    private SWLinkedInManager linkedinManager;
-    private RequestToken linkedInRequestToken;
-
-    // Constructor
     public MainPage()
     {
       InitializeComponent();
-      System.Diagnostics.Debug.WriteLine(SWFacebookSettings.GetAccessToken());
+
+      if (SWTwitterSettings.IsConnected())
+        twManager = new SWTwitterManager();
+      if (SWFacebookSettings.IsConnected())
+        fbManager = new SWFacebookManager();
+      if (SWLinkedInSettings.IsConnected())
+        liManager = new SWLinkedInManager();
+
+      twManager.FetchFeeds();
+      twManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(twManager_FeedsChanged);
+      IntializePage();
     }
 
-    private void button1_Click(object sender, RoutedEventArgs e)
+    void twManager_FeedsChanged(object sender, SocialLinkEventArgs e)
     {
-      FacebookOAuthClient oauth = new FacebookOAuthClient();
-      Uri loginUrl = oauth.GetLoginUrl(SWFacebookSettings.GetLoginParameters());
-      System.Diagnostics.Debug.WriteLine(loginUrl.ToString());
-      this.authBrowser.Navigate(loginUrl);
-    }
 
-    private void authBrowser_Navigating(object sender, NavigatingEventArgs e)
+      Deployment.Current.Dispatcher.BeginInvoke(() => { TwitterView.DataContext = twManager; });
+    }
+  
+    void IntializePage()
     {
-      System.Diagnostics.Debug.WriteLine(e.Uri.ToString());
-      FacebookOAuthResult rs;
-      if (FacebookOAuthResult.TryParse(e.Uri, out rs)) {
-        if (rs.IsSuccess) {
-          SWFacebookSettings.SetAccessToken(rs.AccessToken);
-        }else {
-          MessageBox.Show("facebook autho failed");
-        }
-        e.Cancel = true;
-        this.authBrowser.Visibility = Visibility.Collapsed;
+      /*
+      if (fbManager != null)
+      {
+        PivotItem fbItem = new PivotItem();
+        fbItem.DataContext = fbManager;
       }
+      */
 
-      if (SWTwitterSettings.IsTwitterCallback(e.Uri))
+      if (twManager != null)
       {
-        HandleTwitterAuthorization(e.Uri);
-        e.Cancel = true;
-      }
-      else if (SWLinkedInSettings.IsLinkedInCallback(e.Uri))
-      {
-        HandleLinkedInAuthorization(e.Uri);
-        e.Cancel = true;
+        PivotItem twItem = new PivotItem();
+        twItem.DataContext = twManager;
       }
     }
 
-    private void authBrowser_Navigated(object sender, System.Windows.Navigation.NavigationEventArgs e)
+    void ShowAuthorizationView(object sender, EventArgs e)
     {
-      authBrowser.Visibility = Visibility.Visible;
+      NavigationService.Navigate(new Uri("//Views/AuthorizationView.xaml"));
     }
 
-    private void authBrowser_LoadCompleted(object sender, System.Windows.Navigation.NavigationEventArgs e)
+    void ShowSettingsView(object sender, EventArgs e)
     {
-     
-    }
 
-    private void button2_Click(object sender, RoutedEventArgs e)
-    {
-      if (!SWFacebookSettings.IsConnected())
-      {
-        System.Diagnostics.Debug.WriteLine("Account not linked yet!");
-        return;
-      }
-
-      if (facebookManager == null)
-      {
-        facebookManager = new SWFacebookManager();
-        facebookManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(fm_FeedsChanged);
-      }
-      facebookManager.FetchFeeds();
-    }
-
-    void fm_FeedsChanged(object sender, SocialLinkEventArgs e)
-    {
-      if (e.Error != null)
-        System.Diagnostics.Debug.WriteLine(e.Error.Message);
-      else
-        System.Diagnostics.Debug.WriteLine(e.Status);
-    }
-
-    private void button3_Click(object sender, RoutedEventArgs e)
-    {
-      if (twService == null)
-        twService = new TwitterService(SWTwitterSettings.ConsumerKey, SWTwitterSettings.ConsumerSecret);
-      twService.GetRequestToken((token, response) =>
-        {
-          if (token == null)
-          {
-            Deployment.Current.Dispatcher.BeginInvoke(() => { MessageBox.Show("Cannot request twitter"); });
-            System.Diagnostics.Debug.WriteLine(response.Response);
-            return;
-          }
-          this.twRequestToken = token;
-          Uri uri = twService.GetAuthenticationUrl(token);
-          Deployment.Current.Dispatcher.BeginInvoke(()=> {
-            System.Diagnostics.Debug.WriteLine(uri.ToString());
-            this.authBrowser.Navigate(uri);
-          });
-        }
-      );
-    }
-
-    private void button4_Click(object sender, RoutedEventArgs e)
-    {
-      if (!SWTwitterManager.IsConnected())
-      {
-        System.Diagnostics.Debug.WriteLine("Account not linked yet!");
-        return;
-      }
-
-      if (twitterManager == null)
-      {
-        twitterManager = new SWTwitterManager();
-        twitterManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(st_FeedsChanged);
-      }
-
-      twitterManager.FetchFeeds();
-    }
-
-    void st_FeedsChanged(object sender, SocialLinkEventArgs e)
-    {
-      if (e.Error != null)
-        System.Diagnostics.Debug.WriteLine(e.Error.Message);
-      else
-        System.Diagnostics.Debug.WriteLine(e.Status);
-    }
-
-    private void button5_Click(object sender, RoutedEventArgs e)
-    {
-      // Validate linkedin
-      var authorizer = new OAuthAuthorizer(SWLinkedInSettings.ConsumerKey, SWLinkedInSettings.ConsumerSecret);
-      authorizer.GetRequestToken(SWLinkedInSettings.RequestTokenUri)
-        .Select(res => res.Token)
-        .ObserveOnDispatcher()
-        .Subscribe(token =>
-        {
-          linkedInRequestToken = token;
-          string url = authorizer.BuildAuthorizeUrl(SWLinkedInSettings.AuthorizeUri, token);
-          this.authBrowser.Navigate(new Uri(url));
-        });
-    }
-
-    private void button6_Click(object sender, RoutedEventArgs e)
-    {
-      if (!SWLinkedInManager.IsConnected())
-      {
-        System.Diagnostics.Debug.WriteLine("LinkedIn is not connected!");
-        return;
-      }
-
-      if (linkedinManager == null) linkedinManager = new SWLinkedInManager();
-
-      OAuthClient client = new OAuthClient(SWLinkedInSettings.ConsumerKey,
-        SWLinkedInSettings.ConsumerSecret, SWLinkedInSettings.GetAccessToken())
-      {
-        Url = "http://api.linkedin.com/v1/people/~/network/updates",
-        Parameters = { { "format", "json" } }
-      };
-      client.GetResponseText()
-        .Subscribe(a =>
-        {
-          System.Diagnostics.Debug.WriteLine(a);
-        });
-    }
-
-    private void HandleTwitterAuthorization(Uri url)
-    {
-      // Get the verifier from the redirected url and get access token
-      var results= GeneralUtils.GetQueryParameters(url);
-
-      // If no verifier, we return to page
-      if (results == null || !results.ContainsKey("oauth_verifier"))
-      {
-        MessageBox.Show("Reason unknown", "Twitter Authentication Failed", MessageBoxButton.OK);
-        return;
-      }
-
-      // If have verifier, we get accesstoken
-      string verifyPin = results["oauth_verifier"];
-      twService.GetAccessToken(twRequestToken, verifyPin, (token, response) =>
-      {
-        if (token == null)
-        {
-          // Handle when we did not receice a token;
-          System.Diagnostics.Debug.WriteLine("cannot obtain twitter token!");
-          return;
-        }
-        else
-        {
-          // Now that we got the access token, we can save the tokens
-          SWTwitterSettings.SetAccessToken(new AccessToken(token.Token, token.TokenSecret));
-
-          // Notify UI we can twitter feeds now
-        }
-
-        // Remove browser
-        Deployment.Current.Dispatcher.BeginInvoke(() =>
-        {
-          this.authBrowser.Visibility = Visibility.Collapsed;
-        });
-      });
-    }
-
-    private void HandleLinkedInAuthorization(Uri url)
-    {
-      var results = GeneralUtils.GetQueryParameters(url);
-      
-      // If no verifier or query, we return to page
-      if (results == null || !results.ContainsKey("oauth_verifier"))
-      {
-        MessageBox.Show("Reason unknown", "Twitter Authentication Failed", MessageBoxButton.OK);
-        return;
-      }
-
-      string verifyPin = results["oauth_verifier"];
-      var authorizer = new OAuthAuthorizer(SWLinkedInSettings.ConsumerKey, SWLinkedInSettings.ConsumerSecret);
-      authorizer.GetAccessToken(SWLinkedInSettings.AccessTokenUri, linkedInRequestToken, verifyPin)
-        .ObserveOnDispatcher()
-        .Subscribe(res =>
-        {
-          SWLinkedInSettings.SetAccessToken(res.Token);
-          System.Diagnostics.Debug.WriteLine("Successfully got linkedin access token: " + res.Token.ToString());
-          authBrowser.Visibility = Visibility.Visible;
-        });
-    }
-
-    private void facebookUpdate_Click(object sender, RoutedEventArgs e)
-    {
-      if (facebookManager != null) facebookManager.UpdateFeeds();
-      else System.Diagnostics.Debug.WriteLine("Fetch some feeds!");
-    }
-
-    private void twitterUpdate_Click(object sender, RoutedEventArgs e)
-    {
-      if (twitterManager != null) twitterManager.UpdateFeeds();
-      else System.Diagnostics.Debug.WriteLine("Fetch some feeds!");
-    }
-
-    private void linkedIn_Click(object sender, RoutedEventArgs e)
-    {
-      if (linkedinManager != null) linkedinManager.UpdateFeeds();
-      else System.Diagnostics.Debug.WriteLine("Fetch some feeds!");
     }
   }
 }

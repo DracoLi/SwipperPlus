@@ -1,0 +1,81 @@
+﻿<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance"
+    xmlns:MyControls="clr-namespace:SwipperPlus.Controls"
+    xmlns:convert="clr-namespace:SwipperPlus.Utils.Converters"
+    x:Class="SwipperPlus.Views.Twitter.TWPivotView"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeNormal}"
+    Foreground="{StaticResource PhoneForegroundBrush}"
+    d:DesignHeight="480" d:DesignWidth="480"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch" 
+    d:DataContext="{d:DesignData /SampleData/SWTwitterManagerSampleData.xaml}">
+  
+  <UserControl.Resources>
+    <convert:BoolToVisibleConverter x:Name="VisibilityConverter"/>
+    <convert:DateTimeToTwitterTimeConverter x:Name="TwitterTimeConverter"/>
+  </UserControl.Resources>
+  
+  <Grid x:Name="LayoutRoot" >
+    <!--<MyControls:SWRichTextBox Text="{Binding Title}" />-->
+    <ListBox ItemsSource="{Binding Feeds}">
+      <ListBox.ItemContainerStyle>
+        <Style TargetType="ListBoxItem">
+          <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
+        </Style>
+      </ListBox.ItemContainerStyle>
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <!-- Outer layer -->
+          <StackPanel>
+            <!-- Inner Content Layer -->
+            <Grid Margin="15,10,15,10" HorizontalAlignment="Stretch">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="*"/>
+              </Grid.ColumnDefinitions>
+              <MyControls:PlaceImage Margin="0,7,15,0" Grid.Column="0"
+                                     VerticalAlignment="Top" 
+                                     PlaceholderSource="/images/y_normal.png"
+                                     Source="{Binding Path=OriginalUser.Icon}" />
+              <!--
+              <MyControls:PlaceImage.Clip>
+                <RectangleGeometry RadiusX="6" RadiusY="6" Rect="0,0,,48,48"/>
+              </MyControls:PlaceImage.Clip>
+              -->
+
+              <!--
+            <Image Grid.Column="0" Margin="10" Width="48" Height="48" Source="/Images/y_normal.png">
+              <Image.Clip>
+                  <RectangleGeometry RadiusX="6" RadiusY="6" Rect="0,0,,48,48"/>
+              </Image.Clip>
+            </Image>
+            -->
+              <StackPanel Grid.Column="1">
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                  </Grid.ColumnDefinitions>
+                  <TextBlock Grid.Column="0" Text="{Binding OriginalUser.DisplayName, Mode=OneWay}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Date, Mode=OneWay, Converter={StaticResource TwitterTimeConverter}}" />
+                </Grid>
+                <MyControls:SWRichTextBox Text="{Binding XmlMessage}" Margin="-12,0,0,0" />
+                <StackPanel Orientation="Horizontal"
+                            Visibility="{Binding Path=IsRetweet,Converter={StaticResource VisibilityConverter}}"> 
+                  <TextBlock Text="Retweeted by " />
+                  <TextBlock Text="{Binding TweetedUser.DisplayName}" />
+                </StackPanel>
+              </StackPanel>
+            </Grid>
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </Grid>
+</UserControl>

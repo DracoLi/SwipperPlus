@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Facebook;
 using Newtonsoft.Json.Linq;
 using SwipperPlus.Utils;
@@ -7,7 +8,7 @@ using SwipperPlus.Utils.Parsers;
 using SwipperPlus.Model.Facebook;
 using SwipperPlus.Settings;
 
-namespace SwipperPlus.Model
+namespace SwipperPlus.ViewModel
 {
   /// <summary>
   /// ViewModel for the Facebook feed
@@ -17,8 +18,16 @@ namespace SwipperPlus.Model
     /// <summary>
     /// Every facebook feed for the user
     /// </summary>
-    public List<FacebookFeed> Feeds { private set; get; }
-    
+    public ObservableCollection<FacebookFeed> Feeds { private set; get; }
+
+    /// <summary>
+    /// Title of this social link, used by pivot item header
+    /// </summary>
+    public override string Title
+    {
+      get { return "Facebook"; }
+    }
+
     /// <summary>
     /// All facebook users are stored here to reduce duplicates
     /// </summary>
@@ -41,7 +50,7 @@ namespace SwipperPlus.Model
     public override void FetchFeeds()
     {
       // Do this so that we know we are fetching new feeds
-      Feeds = new List<FacebookFeed>();
+      Feeds = new ObservableCollection<FacebookFeed>();
 
       string q1, q2, q3;
       getQueries(out q1, out q2, out q3);
@@ -49,6 +58,9 @@ namespace SwipperPlus.Model
       fb.QueryAsync(queries);
     }
 
+    /// <summary>
+    /// Get only new feeds from facebook
+    /// </summary>
     public override void UpdateFeeds()
     {
       long lastTime = GeneralUtils.DateTimeToUnixTimestamp(Feeds[0].Date);
@@ -102,16 +114,17 @@ namespace SwipperPlus.Model
       }
 
       // Determine current feed status
-      FeedStatus status = Feeds.Count == 0 ? FeedStatus.New : FeedStatus.Updated;
+      FeedStatus status = FeedStatus.New;
+      if (Feeds.Count != 0)
+      {
+        status = FeedStatus.Updated;
+        Feeds = new ObservableCollection<FacebookFeed>();
+      }
 
       // Look through all feeds, parsing feeds one by one
       IEnumerable<JToken> rawfeeds = rawFeeds[0]["fql_result_set"].Children();
-      List<FacebookFeed> tempFeeds = new List<FacebookFeed>();
       foreach (JToken oneResult in rawfeeds)
-        tempFeeds.Add(FacebookParser.ParseFeed(oneResult));
-
-      // Add new feeds to top of list
-      Feeds.InsertRange(0, tempFeeds);
+        Feeds.Add(FacebookParser.ParseFeed(oneResult));
 
       // Raise feeds parsed event
       OnRaiseFeedsEvent(new SocialLinkEventArgs(status));
