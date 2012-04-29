@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace SwipperPlus.Model
 {
-  public class Connection : INotifyPropertyChanged
+  public class SWConnection : INotifyPropertyChanged
   {
     public string Name { get; set; }
 
@@ -26,7 +26,7 @@ namespace SwipperPlus.Model
       }
     }
 
-    public Connection(string name)
+    public SWConnection(string name)
     {
       Name = name;
     }

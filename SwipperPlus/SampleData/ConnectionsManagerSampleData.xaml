@@ -2,8 +2,8 @@
   xmlns:ViewModels="clr-namespace:SwipperPlus.ViewModel"
   xmlns:Models="clr-namespace:SwipperPlus.Model">
   <ViewModels:ConnectionsManager.Connections>
-    <Models:Connection IsConnected="False" DisplayName="Facebook"/>
-    <Models:Connection IsConnected="True" DisplayName="Twitter"/>
-    <Models:Connection IsConnected="True" DisplayName="LinkedIn"/>
+    <Models:SWConnection IsConnected="False" Name="Facebook"/>
+    <Models:SWConnection IsConnected="True" Name="Twitter"/>
+    <Models:SWConnection IsConnected="True" Name="LinkedIn"/>
   </ViewModels:ConnectionsManager.Connections>
 </ViewModels:ConnectionsManager>

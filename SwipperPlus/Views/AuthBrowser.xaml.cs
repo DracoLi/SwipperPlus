@@ -322,7 +322,7 @@ namespace SwipperPlus.Views
     private void twFailedAndGoBack()
     {
       displayErrorAndGoBack("Twitter authentication failed." + Environment.NewLine +
-        "Please go back and try again.");
+        "Please go back and try again later.");
     }
 
     /// <summary>
@@ -331,7 +331,7 @@ namespace SwipperPlus.Views
     private void liFailedAndGoBack()
     {
       displayErrorAndGoBack("LinkedIn authentication failed." + Environment.NewLine +
-        "Please go back and try again.");
+        "Please go back and try again later.");
     }
 
     private void goBack()

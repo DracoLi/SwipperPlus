@@ -27,14 +27,14 @@ namespace SwipperPlus.Model.Facebook
     public DateTime Date { get; set; }
 
     /// <summary>
-    /// Id of the person who posted it
+    /// Person who posted the feed
     /// </summary>
-    public UInt64 SourcePerson { get; set; }
+    public FacebookUser SourceUser { get; set; }
 
     /// <summary>
-    /// ID of the person who the feed is for. Used for conversation feeds
+    /// Person who the feed is for. Used for conversation feeds
     /// </summary>
-    public UInt64 TargetPerson { get; set; }
+    public FacebookUser TargetUser { get; set; }
 
     /// <summary>
     /// This is the original message pared into rich text box xml format
@@ -50,6 +50,16 @@ namespace SwipperPlus.Model.Facebook
     /// This corresponds to an action
     /// </summary>
     public string Description { get; set; }
+
+    /// <summary>
+    /// Xmal representation of the description
+    /// </summary>
+    public string XmlDescription { get; set; }
+
+    /// <summary>
+    /// A groups of description tags in the message index by their offeset
+    /// </summary>
+    public IList<SWTag> DescriptionTags { get; set; }
 
     /// <summary>
     /// Handles likes & comments.

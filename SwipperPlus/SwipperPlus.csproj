@@ -98,7 +98,7 @@
     <Compile Include="Controls\SWRichTextBox.xaml.cs">
       <DependentUpon>SWRichTextBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\Connection.cs" />
+    <Compile Include="Model\SWConnection.cs" />
     <Compile Include="Model\Facebook\FacebookComment.cs" />
     <Compile Include="Model\Facebook\FacebookAttachment.cs" />
     <Compile Include="Model\Facebook\FacebookItem.cs" />
@@ -106,6 +106,7 @@
     <Compile Include="Model\Facebook\FacebookFeed.cs" />
     <Compile Include="Model\LinkedIn\LinkedInFeed.cs" />
     <Compile Include="Model\LinkedIn\LinkedInUser.cs" />
+    <Compile Include="Model\SWTag.cs" />
     <Compile Include="Model\SWToken.cs" />
     <Compile Include="Model\Twitter\SWTwitterAttachment.cs" />
     <Compile Include="Model\Twitter\SWTwitterFeed.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Settings\SWLinkedInSettings.cs" />
     <Compile Include="Settings\SWTwitterSettings.cs" />
     <Compile Include="Utils\Converters\BoolConverters.cs" />
+    <Compile Include="Utils\Converters\NullConverters.cs" />
     <Compile Include="Utils\Converters\TimeConverters.cs" />
     <Compile Include="Utils\Parsers\FacebookParser.cs" />
     <Compile Include="Utils\GeneralUtils.cs" />
@@ -170,8 +172,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Twitter\TWPivotView.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -203,6 +205,9 @@
   </ItemGroup>
   <ItemGroup>
     <DesignData Include="SampleData\ConnectionsManagerSampleData.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+    </DesignData>
+    <DesignData Include="SampleData\SWFacebookManagerSampleData.xaml">
       <Generator>MSBuild:MarkupCompilePass1</Generator>
     </DesignData>
     <DesignData Include="SampleData\SWTwitterManagerSampleData.xaml">

@@ -124,7 +124,7 @@ namespace SwipperPlus.ViewModel
       // Look through all feeds, parsing feeds one by one
       IEnumerable<JToken> rawfeeds = rawFeeds[0]["fql_result_set"].Children();
       foreach (JToken oneResult in rawfeeds)
-        Feeds.Add(FacebookParser.ParseFeed(oneResult));
+        Feeds.Add(FacebookParser.ParseFeed(oneResult, People));
 
       // Raise feeds parsed event
       OnRaiseFeedsEvent(new SocialLinkEventArgs(status));
@@ -138,8 +138,10 @@ namespace SwipperPlus.ViewModel
             "AND type='newsfeed') AND is_hidden = 0 ";
       if (lastTime > 0)
         q1 += "AND created_time > " + lastTime + " ";
+      q1 += "ORDER BY created_time DESC ";
+      if (lastTime == 0)
+        q1 += "LIMIT " + GeneralSettings.FeedsToGet;
 
-      q1 += "ORDER BY created_time DESC LIMIT 0,10";
       q2 = "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT actor_id FROM #query0)";
       q3 = "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT target_id FROM #query0)";
     }

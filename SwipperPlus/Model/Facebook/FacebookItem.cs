@@ -10,9 +10,9 @@ namespace SwipperPlus.Model.Facebook
   public class FacebookItem
   {
     public int LikesCount { get; set; }
-    public List<UInt64> FriendLikes { get; set; }
+    public IList<UInt64> FriendLikes { get; set; }
 
     public int CommentsCount { get; set; }
-    public List<FacebookComment> Comments { get; set; }
+    public IList<FacebookComment> Comments { get; set; }
   }
 }

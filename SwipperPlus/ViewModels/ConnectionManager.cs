@@ -13,31 +13,31 @@ namespace SwipperPlus.ViewModel
   /// </summary>
   public class ConnectionsManager
   {
-    public ObservableCollection<Connection> Connections { get; set; }
+    public ObservableCollection<SWConnection> Connections { get; set; }
 
     public ConnectionsManager()
     {
-      Connections = new ObservableCollection<Connection>();
+      Connections = new ObservableCollection<SWConnection>();
       populateConnections();
     }
 
     private void populateConnections()
     {
-      Connection fbfeed = new Connection("Facebook")
+      SWConnection fbfeed = new SWConnection("Facebook")
       {
         IsConnected = SWFacebookSettings.IsConnected(),
       };
       fbfeed.PropertyChanged += new PropertyChangedEventHandler(fbFeed_PropertyChanged);
       Connections.Add(fbfeed);
 
-      Connection twfeed = new Connection("Twitter")
+      SWConnection twfeed = new SWConnection("Twitter")
       {
         IsConnected = SWTwitterSettings.IsConnected(),
       };
       twfeed.PropertyChanged += new PropertyChangedEventHandler(twfeed_PropertyChanged);
       Connections.Add(twfeed);
 
-      Connection lifeed = new Connection("LinkedIn")
+      SWConnection lifeed = new SWConnection("LinkedIn")
       {
         IsConnected = SWLinkedInSettings.IsConnected(),
       };
@@ -47,7 +47,7 @@ namespace SwipperPlus.ViewModel
 
     private void lifeed_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-      Connection c = sender as Connection;
+      SWConnection c = sender as SWConnection;
       if (e.PropertyName.Equals("IsConnected") && !c.IsConnected)
       {
         SWLinkedInSettings.RemoveAccessToken();
@@ -56,7 +56,7 @@ namespace SwipperPlus.ViewModel
 
     private void twfeed_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-      Connection c = sender as Connection;
+      SWConnection c = sender as SWConnection;
       if (e.PropertyName.Equals("IsConnected") && !c.IsConnected)
       {
         SWTwitterSettings.RemoveAccessToken();
@@ -65,7 +65,7 @@ namespace SwipperPlus.ViewModel
 
     private void fbFeed_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-      Connection c = sender as Connection;
+      SWConnection c = sender as SWConnection;
       if (e.PropertyName.Equals("IsConnected") && !c.IsConnected)
       {
         SWFacebookSettings.RemoveAccessToken();

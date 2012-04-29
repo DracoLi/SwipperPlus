@@ -37,15 +37,15 @@ namespace SwipperPlus
       if (SWLinkedInSettings.IsConnected())
         liManager = new SWLinkedInManager();
 
-      twManager.FetchFeeds();
-      twManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(twManager_FeedsChanged);
+      fbManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(fbManager_FeedsChanged);
+      fbManager.FetchFeeds();
+
       IntializePage();
     }
 
-    void twManager_FeedsChanged(object sender, SocialLinkEventArgs e)
+    void fbManager_FeedsChanged(object sender, SocialLinkEventArgs e)
     {
-
-      Deployment.Current.Dispatcher.BeginInvoke(() => { TwitterView.DataContext = twManager; });
+      Deployment.Current.Dispatcher.BeginInvoke(() => { TwitterView.DataContext = fbManager; });
     }
   
     void IntializePage()

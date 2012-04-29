@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:convert="clr-namespace:SwipperPlus.Utils.Converters"
     xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
-    xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"        xmlns:MyC="clr-namespace:SwipperPlus.Controls"
+    xmlns:toolkitPrimitives="clr-namespace:Microsoft.Phone.Controls.Primitives;assembly=Microsoft.Phone.Controls.Toolkit"
+    xmlns:MyC="clr-namespace:SwipperPlus.Controls"
     x:Class="SwipperPlus.Views.AuthorizationView"
     d:DataContext="{d:DesignData /SampleData/ConnectionsManagerSampleData.xaml}"
     SupportedOrientations="Portrait" Orientation="Portrait"
@@ -130,11 +131,14 @@
 
     <!--ContentPanel - place additional content here-->
     <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-      
-      <!--
-      <RichTextBox Name="rich2"><Paragraph FontSize="20" FontFamily="Segoe WP" Foreground="#FFFFFFFF" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" TextAlignment="Left"><Run Text="Hey Nerds, BATMAN PHSYSICS via " /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://fuckyeahmath.tumblr.com/\">http://fuckyeahmath.tumblr.com/\</Hyperlink><Run Text="" /><LineBreak /><Run Text="" /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png">http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png</Hyperlink><Run Text="" /><LineBreak /><Run Text="Come and see Mother's &quot;Day&quot; featuring The Girl in the Picture Tries to Hang up the Phone!" /></Paragraph>
+
+
+      <RichTextBox Name="rich2">
+        <Paragraph FontSize="20" FontFamily="Segoe WP" Foreground="#FFFFFFFF" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" TextAlignment="Left">
+          <Run Text="Hey&amp; Nerds, BATMAN PHSYSICS via " />
+          <Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://fuckyeah&amp;math.tumblr.com/\">http://fuckyeahmath.tumblr.com/\</Hyperlink><Run Text="" /><LineBreak /><Run Text="" /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png">http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png</Hyperlink><Run Text="" /><LineBreak /><Run Text="Come and see Mother's &quot;Day&quot; featuring The Girl in the Picture Tries to Hang up the Phone!" /></Paragraph>
       </RichTextBox>
-      -->
+      
       
       <ListBox Visibility="Collapsed" HorizontalAlignment="Stretch" x:Name="ConnectionsList" VerticalAlignment="Stretch" Width="460" ItemsSource="{Binding Connections}" >
         <ListBox.Resources>

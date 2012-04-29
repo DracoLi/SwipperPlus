@@ -6,7 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
-    xmlns:views="clr-namespace:SwipperPlus.Views.Twitter"
+    xmlns:views="clr-namespace:SwipperPlus.Views.Facebook"
     x:Class="SwipperPlus.MainPage"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
@@ -38,7 +38,7 @@
       <controls:Pivot Title="Swipper+" Name="MainPivot">
         <controls:PivotItem Header="Twitter">
           <StackPanel>
-            <views:TWPivotView x:Name="TwitterView" HorizontalAlignment="Stretch" Height="600"/>
+            <views:FBPivotView x:Name="TwitterView" HorizontalAlignment="Stretch" Height="600"/>
           </StackPanel>
         </controls:PivotItem>
         <!--

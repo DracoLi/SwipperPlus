@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json.Linq;
+using SwipperPlus.Model;
 using SwipperPlus.Model.Facebook;
 using SwipperPlus.Utils;
 
@@ -11,15 +13,20 @@ namespace SwipperPlus.Utils.Parsers
     /// <summary>
     /// Parses a Facebook feed
     /// </summary>
-    public static FacebookFeed ParseFeed(JToken token)
+    public static FacebookFeed ParseFeed(JToken token, Dictionary<ulong, FacebookUser> people)
     {
       FacebookFeed result = new FacebookFeed();
 
       // Add info every feed has
-      result.Message = tokenHasValue(token["message"]) ? (string)token["message"] : null;
+      if (tokenHasValue(token["message"]))
+      {
+        result.Message = (string)token["message"];
+        result.XmlMessage = RichTextBoxParser.ParseStringToXaml(result.Message);
+        System.Diagnostics.Debug.WriteLine(result.XmlMessage);
+      }
       result.ID = (string)token["post_id"];
       if (tokenHasValue(token["actor_id"]))
-        result.SourcePerson = (UInt64)token["actor_id"];
+        result.SourceUser = people[(UInt64)token["actor_id"]];
       result.Date = GeneralUtils.UnixTimestampToDateTime((Int64)token["created_time"]);
 
       //// Add Facebook properties ////
@@ -51,11 +58,42 @@ namespace SwipperPlus.Utils.Parsers
 
       // Target person
       if (tokenHasValue(token["target_id"]))
-        result.TargetPerson = (UInt64)token["target_id"];
+        result.TargetUser = people[(UInt64)token["target_id"]];
 
-      // Description
+      // Description + Description tags + xmal description
       if (tokenHasValue(token["description"]))
+      {
         result.Description = (string)token["description"];
+        if (tokenHasValue(token["description_tags"])) {
+          result.DescriptionTags = new List<SWTag>();
+          foreach (JToken tagToken in token["description_tags"].Values())
+          {
+            // Handle both types of description tags we going to get
+            // Sometime its an object, others its an array
+            JToken targetToken = tagToken;
+            if (tagToken is JArray)
+              targetToken = tagToken[0];
+            
+            SWTag tag = new SWTag
+            {
+              ID = (ulong)targetToken["id"],
+              DisplayValue = (string)targetToken["name"],
+              Offset = (int)targetToken["offset"],
+              Length = (int)targetToken["length"],
+              Type = (string)targetToken["type"]
+            };
+            result.DescriptionTags.Add(tag);
+          }
+
+          // Sort the tags in desending offset order to aid replacement
+          if (result.DescriptionTags.Count > 0)
+          {
+            result.DescriptionTags = result.DescriptionTags.OrderByDescending(x => x.Offset).ToList();
+          }
+          result.XmlDescription = RichTextBoxParser.ParseStringToXamlWithTags(result.Description, result.DescriptionTags);
+          System.Diagnostics.Debug.WriteLine(result.XmlDescription);
+        }
+      }
 
       // Attachment
       if (tokenHasValue(token["attachment"]) && token.HasValues)
@@ -139,7 +177,7 @@ namespace SwipperPlus.Utils.Parsers
       FeedType result = FeedType.NotSupported;
 
       // Figure out type from supplied type param
-      if      (type == 56 && feed.TargetPerson != 0)      result = FeedType.Conversation;
+      if      (type == 56 && feed.TargetUser != null)      result = FeedType.Conversation;
       else if ((type == 80 || type == 128 || type == 247) && 
                 feed.Attachment != null)                  result = FeedType.Attachment;
       else if (type == 46 || feed.Message != null)        result = FeedType.Text;

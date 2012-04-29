@@ -14,9 +14,6 @@ using TweetSharp;
 using Codeplex.OAuth;
 using SwipperPlus.Model;
 using SwipperPlus.ViewModel;
-using SwipperPlus.Settings;
-using SwipperPlus.Utils;
-using SwipperPlus.Utils.Parsers;
 
 namespace SwipperPlus.Views
 {
@@ -25,17 +22,6 @@ namespace SwipperPlus.Views
     public AuthorizationView()
     {
       InitializeComponent();
-      /*
-       <Section xml:space="preserve" HasTrailingParagraphBreakOnPaste="False" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"><Paragraph FontSize="20" FontFamily="Segoe WP" Foreground="#FFFFFFFF" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" TextAlignment="Left"><Run Text="Hey Nerds, BATMAN PHSYSICS via " /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://fuckyeahmath.tumblr.com/\>http://fuckyeahmath.tumblr.com/\</HyperLink><Run Text="" /><LineBreak /><Run Text="" /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png>http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png</HyperLink><Run Text="" /><LineBre'
-       */
-      string str = RichTextBoxParser.ParseStringToRichTextBox(@"Time for your week in entertainment with Jessica Chobot! http://youtu.be/L-ysuo68HJk");
-      System.Diagnostics.Debug.WriteLine(str);
-
-      if (SWTwitterSettings.IsConnected())
-      {
-        SWTwitterManager tm = new SWTwitterManager();
-        tm.FetchFeeds();
-      }
     }
 
     /// <summary>
@@ -51,7 +37,10 @@ namespace SwipperPlus.Views
       // Refresh data context since user could have authorized something
       InitializePageState();
 
-      // Check if we just enabled a link
+      SWFacebookManager fbManager = new SWFacebookManager();
+      fbManager.FetchFeeds();
+
+      // Check if we just enabled a link, if so display notification
       if (PhoneApplicationService.Current.State.ContainsKey(Constants.AUTH_NOTIFICATION))
       {
         string notification = (string)PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION];
@@ -82,7 +71,7 @@ namespace SwipperPlus.Views
     private void ConnectButtonPressed(object sender, RoutedEventArgs e)
     {
       // Handle this command
-      Connection c = (sender as Button).DataContext as Connection;
+      SWConnection c = (sender as Button).DataContext as SWConnection;
       if (c.IsConnected)
       {
         // Deauthorize the connection if user confirms
@@ -103,7 +92,7 @@ namespace SwipperPlus.Views
     /// <summary>
     /// Authorize a connection
     /// </summary>
-    private void authorizeConnection(Connection c)
+    private void authorizeConnection(SWConnection c)
     {
       // Authorize this connection
       authenticateLink(c.Name);
@@ -112,7 +101,7 @@ namespace SwipperPlus.Views
     /// <summary>
     /// Deauthorize a connection
     /// </summary>
-    private void deauthorizeConnection(Connection c)
+    private void deauthorizeConnection(SWConnection c)
     {
       // Manually set isconnected to false to update UI and settings
       c.IsConnected = false;
