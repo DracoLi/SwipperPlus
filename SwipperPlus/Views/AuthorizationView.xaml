@@ -16,7 +16,8 @@
     shell:SystemTray.IsVisible="True"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}">
+    Background="{StaticResource DefaultPageBackround}"
+    Foreground="{StaticResource DefaultPageForeground}">
   
   <phone:PhoneApplicationPage.Resources>
     <convert:BoolToConnectTextConverter x:Name="ConnectTextConverter"/>
@@ -131,16 +132,14 @@
 
     <!--ContentPanel - place additional content here-->
     <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-
-
-      <RichTextBox Name="rich2">
+      
+      <RichTextBox Name="rich2" Visibility="Collapsed">
         <Paragraph FontSize="20" FontFamily="Segoe WP" Foreground="#FFFFFFFF" FontWeight="Normal" FontStyle="Normal" FontStretch="Normal" TextAlignment="Left">
           <Run Text="Hey&amp; Nerds, BATMAN PHSYSICS via " />
           <Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://fuckyeah&amp;math.tumblr.com/\">http://fuckyeahmath.tumblr.com/\</Hyperlink><Run Text="" /><LineBreak /><Run Text="" /><Hyperlink NavigateUri="/Views/SWBrowser.xaml/uri=http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png">http://28.media.tumblr.com/tumblr_m2lokoQxdT1qg8i80o1_1280.png</Hyperlink><Run Text="" /><LineBreak /><Run Text="Come and see Mother's &quot;Day&quot; featuring The Girl in the Picture Tries to Hang up the Phone!" /></Paragraph>
       </RichTextBox>
       
-      
-      <ListBox Visibility="Collapsed" HorizontalAlignment="Stretch" x:Name="ConnectionsList" VerticalAlignment="Stretch" Width="460" ItemsSource="{Binding Connections}" >
+      <ListBox Visibility="Visible" HorizontalAlignment="Stretch" x:Name="ConnectionsList" VerticalAlignment="Stretch" Width="460" ItemsSource="{Binding Connections}" >
         <ListBox.Resources>
           <Style TargetType="ListBoxItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

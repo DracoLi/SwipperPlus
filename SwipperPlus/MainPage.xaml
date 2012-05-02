@@ -8,15 +8,16 @@
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:views="clr-namespace:SwipperPlus.Views.Facebook"
     x:Class="SwipperPlus.MainPage"
-    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="696"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
+    Background="{StaticResource DefaultPageBackround}"
+    Foreground="{StaticResource DefaultPageForeground}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     shell:SystemTray.IsVisible="True">
 
   <phone:PhoneApplicationPage.ApplicationBar>
-    <shell:ApplicationBar IsVisible="False" IsMenuEnabled="True">
+    <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
       <shell:ApplicationBar.MenuItems>
         <shell:ApplicationBarMenuItem Click="ShowAuthorizationView" Text="Accounts"/>
         <shell:ApplicationBarMenuItem Click="ShowSettingsView" Text="Settings"/>

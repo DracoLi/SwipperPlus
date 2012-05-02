@@ -37,12 +37,19 @@ namespace SwipperPlus
       if (SWLinkedInSettings.IsConnected())
         liManager = new SWLinkedInManager();
 
-      fbManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(fbManager_FeedsChanged);
-      fbManager.FetchFeeds();
-
       IntializePage();
     }
 
+    protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
+    {
+ 	    base.OnNavigatedTo(e);
+      if (SWFacebookSettings.IsConnected())
+      {
+        fbManager = new SWFacebookManager();
+        fbManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(fbManager_FeedsChanged);
+        fbManager.FetchFeeds();
+      }
+    }
     void fbManager_FeedsChanged(object sender, SocialLinkEventArgs e)
     {
       Deployment.Current.Dispatcher.BeginInvoke(() => { TwitterView.DataContext = fbManager; });
@@ -67,7 +74,7 @@ namespace SwipperPlus
 
     void ShowAuthorizationView(object sender, EventArgs e)
     {
-      NavigationService.Navigate(new Uri("//Views/AuthorizationView.xaml"));
+      this.NavigationService.Navigate(new Uri("/Views/AuthorizationView.xaml", UriKind.Relative));
     }
 
     void ShowSettingsView(object sender, EventArgs e)

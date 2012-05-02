@@ -5,7 +5,9 @@ namespace SwipperPlus.Model
 {
   public class SWTag
   {
-    public enum TagType { Page }
+    public enum TagType { 
+      Mention, Link, Hashtag
+    }
 
     public ulong ID { get; set; }
 
@@ -24,6 +26,13 @@ namespace SwipperPlus.Model
     /// </summary>
     public int Length { get; set; }
 
-    public string Type { get; set; }
+    public TagType Type { get; set; }
+
+    public static TagType GetType(string type)
+    {
+      if (type == "page" || type == "user")
+        return TagType.Mention;
+      return TagType.Link;
+    }
   }
 }

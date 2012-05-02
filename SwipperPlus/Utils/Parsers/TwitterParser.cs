@@ -49,7 +49,7 @@ namespace SwipperPlus.Utils.Parsers
         result.OriginalUser = result.TweetedUser;
         result.Message = tweet.Text;
       }
-      result.XmlMessage = RichTextBoxParser.ParseStringToXaml(result.Message);
+      result.XmlMessage = RichTextBoxParser.ParseStringToXamlWithTags(result.Message);
 
       // Get attached urls
       if (tweet.Entities.Urls != null && tweet.Entities.Urls.Count > 0)

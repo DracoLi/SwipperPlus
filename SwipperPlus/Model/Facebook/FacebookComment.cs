@@ -16,7 +16,7 @@ namespace SwipperPlus.Model.Facebook
   /// </summary>
   public class FacebookComment
   {
-    public UInt64 UserID;
+    public FacebookUser User;
     public string Message;
     public DateTime Date;
 

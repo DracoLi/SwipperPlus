@@ -10,6 +10,9 @@ namespace SwipperPlus.Utils.Parsers
 {
   public static class FacebookParser
   {
+
+    private const int maxLinkLength = 120;
+
     /// <summary>
     /// Parses a Facebook feed
     /// </summary>
@@ -17,28 +20,58 @@ namespace SwipperPlus.Utils.Parsers
     {
       FacebookFeed result = new FacebookFeed();
 
-      // Add info every feed has
-      if (tokenHasValue(token["message"]))
-      {
-        result.Message = (string)token["message"];
-        result.XmlMessage = RichTextBoxParser.ParseStringToXaml(result.Message);
-        System.Diagnostics.Debug.WriteLine(result.XmlMessage);
-      }
+      // Get id, time and actors (source and target)
       result.ID = (string)token["post_id"];
+      result.Date = GeneralUtils.UnixTimestampToDateTime((Int64)token["created_time"]);
       if (tokenHasValue(token["actor_id"]))
         result.SourceUser = people[(UInt64)token["actor_id"]];
-      result.Date = GeneralUtils.UnixTimestampToDateTime((Int64)token["created_time"]);
+      if (tokenHasValue(token["target_id"]))
+        result.TargetUser = people[(UInt64)token["target_id"]];
 
-      //// Add Facebook properties ////
+      // Get the core message
+      if (tokenHasValue(token["message"]))
+      {
+        // Get the message tags, null if no tags
+        result.MessageTags = getTags(token["message_tags"]);
+
+        // Format our message
+        result.Message = removeTabs((string)token["message"]);
+        result.XmlMessage = RichTextBoxParser.
+          ParseStringToXamlWithTags(result.Message, result.MessageTags);
+
+        result.HasMessage = true; // Used for binding message visibility
+      }
+
+      // Description + Description tags + xmal description
+      if (tokenHasValue(token["description"]))
+      {
+        // Get description tags, null if no tags
+        result.DescriptionTags = getTags(token["description_tags"]);
+
+        // Format description
+        result.Description = (string)token["description"];
+        result.XmlDescription = RichTextBoxParser.
+          ParseStringToXamlWithTags(result.Description, result.DescriptionTags, true);
+      }
+
+      #region Facebook Properties (Like, Comment, Share)
+      
       FacebookItem fbItem = new FacebookItem();
 
       // Likes
       if (tokenHasValue(token["likes"]["count"]))
       {
         fbItem.LikesCount = (int)token["likes"]["count"];
-        List<UInt64> flikes = new List<UInt64>();
+
+        // Grab friend likes
+        IList<FacebookUser> flikes = new List<FacebookUser>();
         foreach (JToken person in token["likes"]["friends"].Children())
-          flikes.Add((UInt64)person);
+        {
+          FacebookUser likedUser = null;
+          people.TryGetValue((ulong)person, out likedUser);
+          if (likedUser != null)
+            flikes.Add(people[(ulong)person]);
+        }
         if (flikes.Count > 0)
           fbItem.FriendLikes = flikes;
       }
@@ -47,53 +80,20 @@ namespace SwipperPlus.Utils.Parsers
       if (tokenHasValue(token["comments"]["count"]))
       {
         fbItem.CommentsCount = (int)token["comments"]["count"];
+
+        // Grab some comments
         List<FacebookComment> comments = new List<FacebookComment>();
         foreach (JToken comment in token["comments"]["comment_list"])
-          comments.Add(ParseFacebookComment(comment));
+          comments.Add(ParseFacebookComment(comment, ref people));
         if (comments.Count > 0)
           fbItem.Comments = comments;
       }
 
       result.SocialProperties = fbItem;
 
-      // Target person
-      if (tokenHasValue(token["target_id"]))
-        result.TargetUser = people[(UInt64)token["target_id"]];
+      #endregion
 
-      // Description + Description tags + xmal description
-      if (tokenHasValue(token["description"]))
-      {
-        result.Description = (string)token["description"];
-        if (tokenHasValue(token["description_tags"])) {
-          result.DescriptionTags = new List<SWTag>();
-          foreach (JToken tagToken in token["description_tags"].Values())
-          {
-            // Handle both types of description tags we going to get
-            // Sometime its an object, others its an array
-            JToken targetToken = tagToken;
-            if (tagToken is JArray)
-              targetToken = tagToken[0];
-            
-            SWTag tag = new SWTag
-            {
-              ID = (ulong)targetToken["id"],
-              DisplayValue = (string)targetToken["name"],
-              Offset = (int)targetToken["offset"],
-              Length = (int)targetToken["length"],
-              Type = (string)targetToken["type"]
-            };
-            result.DescriptionTags.Add(tag);
-          }
-
-          // Sort the tags in desending offset order to aid replacement
-          if (result.DescriptionTags.Count > 0)
-          {
-            result.DescriptionTags = result.DescriptionTags.OrderByDescending(x => x.Offset).ToList();
-          }
-          result.XmlDescription = RichTextBoxParser.ParseStringToXamlWithTags(result.Description, result.DescriptionTags);
-          System.Diagnostics.Debug.WriteLine(result.XmlDescription);
-        }
-      }
+      #region Facebook Attachment
 
       // Attachment
       if (tokenHasValue(token["attachment"]) && token.HasValues)
@@ -104,13 +104,14 @@ namespace SwipperPlus.Utils.Parsers
         // Figure out attachment type, href and name
         fbAttach.Type = FacebookAttachment.MediaType.Link; // Defaults to Link type
         if (tokenHasValue(attachment["href"]))
-          fbAttach.Href = new Uri((string)attachment["href"]);
+          fbAttach.Source = new Uri((string)attachment["href"]);
         if (tokenHasValue(attachment["name"]))
-          fbAttach.Name = (string)attachment["name"];
+          fbAttach.Name = removeTabs((string)attachment["name"]);
 
         // Adjust values if we have some media in the attachment
         if (tokenHasValue(attachment["media"]) && attachment["media"].HasValues)
         {
+          // We only use the first media for now
           JToken media = attachment["media"][0];
 
           // Adjust type
@@ -118,26 +119,43 @@ namespace SwipperPlus.Utils.Parsers
           {
             string type = (string)media["type"];
             if (type.Equals("photo")) fbAttach.Type = FacebookAttachment.MediaType.Image;
-            else if (type.Equals("video")) fbAttach.Type = FacebookAttachment.MediaType.Video;
             else if (type.Equals("link")) fbAttach.Type = FacebookAttachment.MediaType.Link;
+            // TODO: Treat videos as links for now
+            else if (type.Equals("video")) fbAttach.Type = FacebookAttachment.MediaType.Link;
+            else fbAttach.Type = FacebookAttachment.MediaType.NotSupported;
           }
 
           // Add Src
           if (tokenHasValue(media["src"]))
+          {
             fbAttach.Icon = new Uri((string)media["src"]);
-
+          }
+          
           // Use media href instead of attachment href
           if (tokenHasValue(media["href"]))
-            fbAttach.Href = new Uri((string)media["href"]);
+            fbAttach.Source = new Uri((string)media["href"]);
+
+          // Add description if this attachment is a link
+          if (fbAttach.Type == FacebookAttachment.MediaType.Link &&
+            tokenHasValue(attachment["description"]))
+            fbAttach.Description = GeneralUtils.TrimWords((string)attachment["description"], maxLinkLength);
         }
 
-        // Add this attachment to our feed if we have an href to attach
-        if (fbAttach.Href != null)
+        // Add this attachment to our feed if the attachment is valid (has a source)
+        if (fbAttach.Source != null)
           result.Attachment = fbAttach;
       }
 
+      #endregion
+
       // Finally add the current feedtype
-      result.FeedType = DetermineFacebookFeedType(result, (int)token["type"]);
+      if (token["typle"] != null)
+        result.FeedType = DetermineFacebookFeedType(result, (int)token["type"]);
+
+      // Ignore any type of feeds that we currently do not support
+      if ((result.Attachment != null && result.Attachment.Type == FacebookAttachment.MediaType.NotSupported) ||
+        (result.Message == null && result.Description == null && result.Attachment == null))
+        return null;
 
       return result;
     }
@@ -157,16 +175,17 @@ namespace SwipperPlus.Utils.Parsers
     /// <summary>
     /// Parses a facebook comments from a json token
     /// </summary>
-    public static FacebookComment ParseFacebookComment(JToken token)
+    public static FacebookComment ParseFacebookComment(JToken token, ref Dictionary<ulong, FacebookUser> people)
     {
-      return new FacebookComment()
+      FacebookComment fbc = new FacebookComment()
       {
         Date = GeneralUtils.UnixTimestampToDateTime((Int64)token["time"]),
-        UserID = (UInt64)token["fromid"],
         Message = (string)token["text"],
         Likes = (int)token["likes"],
         UserLiked = (bool)token["user_likes"]
       };
+      people.TryGetValue(((ulong)token["fromid"]), out fbc.User);
+      return fbc;
     }
 
     /// <summary>
@@ -192,6 +211,59 @@ namespace SwipperPlus.Utils.Parsers
     {
       if (token == null) return false;
       return !String.IsNullOrEmpty(token.ToString());
+    }
+
+    /// <summary>
+    /// Get the tags in a token that contains tags
+    /// This is used to get message tags and description tags
+    /// </summary>
+    /// <param name="token">The description token</param>
+    private static IList<SWTag> getTags(JToken token)
+    {
+      if (!tokenHasValue(token)) return null;
+
+      IList<SWTag> result = new List<SWTag>();
+      foreach (JToken tagToken in token.Values())
+      {
+        // Handle both types of description tags we going to get
+        // Sometime its an object, others its an array
+        if (tagToken is JArray)
+          foreach (JToken innerToken in tagToken)
+            result.Add(getTagFromToken(innerToken));
+        else
+          result.Add(getTagFromToken(tagToken));
+      }
+
+      // Sort the tags in desending offset order to aid replacement
+      if (result.Count > 0)
+        return result.OrderByDescending(x => x.Offset).ToList();
+      return null;
+    }
+
+    /// <summary>
+    /// A convenience method to return a tag token into a tag object
+    /// </summary>
+    private static SWTag getTagFromToken(JToken targetToken)
+    {
+      // Check if token is valid
+      if (!tokenHasValue(targetToken)) return null;
+
+      return new SWTag
+      {
+        ID = (ulong)targetToken["id"],
+        DisplayValue = (string)targetToken["name"],
+        Offset = (int)targetToken["offset"],
+        Length = (int)targetToken["length"],
+        Type = SWTag.GetType((string)targetToken["type"])
+      };
+    }
+
+    /// <summary>
+    /// Helper to remove \r in a string
+    /// </summary>
+    private static string removeTabs(string str)
+    {
+      return str.Replace("\\r", "");
     }
   }
 }

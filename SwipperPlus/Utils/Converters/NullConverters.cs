@@ -9,12 +9,7 @@ namespace SwipperPlus.Utils.Converters
   {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-      Visibility result = Visibility.Collapsed;
-      if (value is string)
-        result = value == null || (string)value == String.Empty ? Visibility.Visible : Visibility.Collapsed;
-      else
-        result = value == null ? Visibility.Visible : Visibility.Collapsed;
-      return result;
+      return value == null ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -27,12 +22,11 @@ namespace SwipperPlus.Utils.Converters
   {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-      Visibility result = Visibility.Collapsed;
       if (value is string)
-        result = value == null || (string)value == String.Empty ? Visibility.Collapsed : Visibility.Visible; 
-      else
-        result = value == null ? Visibility.Collapsed : Visibility.Visible; 
-      return result;
+      {
+        return string.IsNullOrEmpty((string)value) ? Visibility.Collapsed : Visibility.Visible;
+      }
+      return value != null ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

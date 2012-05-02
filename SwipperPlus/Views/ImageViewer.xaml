@@ -1,0 +1,35 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="SwipperPlus.Views.ImageViewer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="800"
+    SupportedOrientations="Portrait" Orientation="Portrait">
+
+  <Grid x:Name="LayoutRoot" Background="Transparent">
+    <toolkit:PerformanceProgressBar x:Name="progressBar" 
+                                    IsIndeterminate="False" 
+                                    Foreground="{StaticResource PhoneAccentBrush}" 
+                                    VerticalAlignment="Top" />
+    <Image x:Name="ImgZoom"
+               Stretch="Uniform"
+               RenderTransformOrigin="0,0">
+      <toolkit:GestureService.GestureListener>
+        <toolkit:GestureListener
+                        PinchStarted="OnPinchStarted"
+                        PinchDelta="OnPinchDelta"
+                        DragDelta="OnDragDelta"
+                        DoubleTap="OnDoubleTap"/>
+      </toolkit:GestureService.GestureListener>
+      <Image.RenderTransform>
+        <CompositeTransform
+                        ScaleX="1" ScaleY="1"
+                        TranslateX="0" TranslateY="0"/>
+      </Image.RenderTransform>
+    </Image>
+
+  </Grid>
+</phone:PhoneApplicationPage>

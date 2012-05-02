@@ -148,10 +148,9 @@ namespace SwipperPlus.Views
         if (rs.IsSuccess)
         {
           SWFacebookSettings.SetAccessToken(rs.AccessToken);
-          System.Diagnostics.Debug.WriteLine("Facebook access token: " + rs.AccessToken);
+          // Notify UI facebook is authenticated now
           PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION] = "Facebook is now enabled!";
           goBack();
-          // TODO: Notify UI facebook is authenticated now
         }
         else
         {
@@ -218,6 +217,9 @@ namespace SwipperPlus.Views
       {
         if (token == null)
         {
+          System.Diagnostics.Debug.WriteLine("url=" + uri);
+          System.Diagnostics.Debug.WriteLine("verifyPin=" + verifyPin);
+          this.tw_requestToken = null;
           // Handle when we did not receice a token;
           Deployment.Current.Dispatcher.BeginInvoke(() => { twFailedAndGoBack(); });
           return;
@@ -225,11 +227,9 @@ namespace SwipperPlus.Views
 
         // Now that we got the access token, we can save the tokens
         SWTwitterSettings.SetAccessToken(new AccessToken(token.Token, token.TokenSecret));
-        System.Diagnostics.Debug.WriteLine("Twitter access token: " + token.Token);
+        // Let UI know twitter is authenticated now
         PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION] = "Twitter is now enabled!";
         Deployment.Current.Dispatcher.BeginInvoke(() => { goBack(); });
-
-        // TODO: Let UI know twitter is authenticated now
       });
     }
 
@@ -270,11 +270,9 @@ namespace SwipperPlus.Views
             return;
           }
           SWLinkedInSettings.SetAccessToken(res.Token);
-          System.Diagnostics.Debug.WriteLine("Successfully got linkedin access token: " + res.Token.ToString());
+          // Notify UI that linkedin is now connected
           PhoneApplicationService.Current.State[Constants.AUTH_NOTIFICATION] = "LinkedIn is now enabled!";
           goBack();
-
-          // TODO: notify UI that linkedin is now connected
         });
     }
 

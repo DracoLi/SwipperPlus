@@ -98,6 +98,7 @@
     <Compile Include="Controls\SWRichTextBox.xaml.cs">
       <DependentUpon>SWRichTextBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\Facebook\FacebookFeedList.cs" />
     <Compile Include="Model\SWConnection.cs" />
     <Compile Include="Model\Facebook\FacebookComment.cs" />
     <Compile Include="Model\Facebook\FacebookAttachment.cs" />
@@ -115,7 +116,10 @@
     <Compile Include="Settings\SWLinkedInSettings.cs" />
     <Compile Include="Settings\SWTwitterSettings.cs" />
     <Compile Include="Utils\Converters\BoolConverters.cs" />
+    <Compile Include="Utils\Converters\CustomConverters.cs" />
+    <Compile Include="Utils\Converters\IntConverters.cs" />
     <Compile Include="Utils\Converters\NullConverters.cs" />
+    <Compile Include="Utils\Converters\StringConverters.cs" />
     <Compile Include="Utils\Converters\TimeConverters.cs" />
     <Compile Include="Utils\Parsers\FacebookParser.cs" />
     <Compile Include="Utils\GeneralUtils.cs" />
@@ -139,8 +143,14 @@
     <Compile Include="Views\AuthBrowser.xaml.cs">
       <DependentUpon>AuthBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ImageViewer.xaml.cs">
+      <DependentUpon>ImageViewer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Facebook\FBPivotView.xaml.cs">
       <DependentUpon>FBPivotView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UriBrowser.xaml.cs">
+      <DependentUpon>UriBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Twitter\TWPivotView.xaml.cs">
       <DependentUpon>TWPivotView.xaml</DependentUpon>
@@ -167,7 +177,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\ImageViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Facebook\FBPivotView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\UriBrowser.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -190,6 +208,7 @@
     <Content Include="Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Images\appbar.transport.play.rest.png" />
     <Content Include="Images\y_normal.png" />
     <Content Include="SplashScreenImage.jpg" />
     <Content Include="Toolkit.Content\ApplicationBar.Cancel.png" />
@@ -224,4 +243,5 @@
   </Target>
   -->
   <ProjectExtensions />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\Expression\Blend\WindowsPhone\v7.1\Microsoft.Expression.Blend.WindowsPhone.targets" />
 </Project>

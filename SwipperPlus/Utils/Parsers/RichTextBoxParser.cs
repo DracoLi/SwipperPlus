@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Media;
 using System.Web;
 using System.Security;
 using System.Collections.Generic;
@@ -14,56 +15,37 @@ namespace SwipperPlus.Utils.Parsers
     private const string beginning = "<Section xml:space=\"preserve\" HasTrailingParagraphBreakOnPaste=\"False\" xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\">";
     private const string end = "</Section>";
     private const string urlregex = @"((ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&amp;%\$#_=]*)?)";
-    
-    private static readonly IDictionary<string, string> defaultStyle = new Dictionary<string, string>()
-    {
-      {"FontSize", "20"},
-      {"FontFamily", "Segoe WP"},
-      {"Foreground", "#FFFFFFFF"},
-      {"FontWeight", "Normal"},
-      {"FontStyle", "Normal"},
-      {"FontStretch", "Normal"},
-      {"TextAlignment", "Left"}
-    };
-
-    private static readonly IDictionary<string, string> emphasizeStyle = new Dictionary<string, string>()
-    {
-
-    };
-
-    private static readonly IDictionary<string, string> tagStyle = new Dictionary<string, string>()
-    {
-    
-    };
-
-    private static readonly IDictionary<string, string> linkStyle = new Dictionary<string, string>()
-    {
-
-    };
 
     /// <summary>
-    /// Parse the message into a xmal string.
-    /// The function tries to guess the links.
+    /// Returns defaults styles for our richtextbox
+    /// Styles are obtained from our main app resources
     /// </summary>
-    internal static string ParseStringToXaml(string msg, IDictionary<string, string> style = null)
+    private static IDictionary<string, string> GetDefaultStyles()
     {
-      // Escape the text for an element attribute value.
-      msg = escapeForAttributeValue(msg);
-      
-      // Parse new lines and other things
-      msg = commonParse(msg, style);
-
-      // Replace all links
-      string linkReplacement = "\" /><Hyperlink NavigateUri=\"/Views/SWBrowser.xaml/type=link&amp;amp;value=$1\">$1</Hyperlink><Run Text=\"";
-      Regex regex = new Regex(urlregex);
-      msg = regex.Replace(msg, linkReplacement);
-
-      return beginning + msg + end;
+      IDictionary<string, string> results = new Dictionary<string, string>();
+      //ResourceDictionary currentResources = Application.Current.Resources;
+      results["DefaultFeedSize"] = "18";// currentResources["DefaultFeedSize"].ToString();
+      results["DefaultFeedFont"] = "Tomaho"; // currentResources["DefaultFeedFont"].ToString();
+      results["DefaultFeedColor"] = "White"; // currentResources["DefaultFeedColor"].ToString();
+      results["DeEmphasizeFeedColor"] = "#adafb3"; // currentResources["DeEmphasizeFeedColor"].ToString();
+      results["EmphasizeFeedColor"] = "#3277ba"; // currentResources["EmphasizeFeedColor"].ToString();
+      results["DefaultLinkColor"] = "#4881c8"; // currentResources["DefaultLinkColor"].ToString();
+      results["DefaultMentionsColor"] = "#3277ba"; // currentResources["DefaultMentionsColor"].ToString();
+      results["DefaultHashtagColor"] = "#adafb3"; // currentResources["DefaultHashtagColor"].ToString();
+      return results;
     }
 
-    internal static string ParseStringToXamlWithTags(string msg, IList<SWTag> tags,
-      IDictionary<string, string> style = null)
+    /// <summary>
+    /// Parse the message into xaml string with tags
+    /// </summary>
+    /// <param name="msg">The message to parse</param>
+    /// <param name="tags">Tags in the message</param>
+    /// <param name="me">The tag that is the source person of the feed</param>
+    /// <returns></returns>
+    internal static string ParseStringToXamlWithTags(string msg, IList<SWTag> tags = null, bool shouldBold = false)
     {
+      IDictionary<string, string> styles = GetDefaultStyles();
+
       // Escape the text for an element attribute value.
       msg = escapeForAttributeValue(msg);
 
@@ -73,45 +55,83 @@ namespace SwipperPlus.Utils.Parsers
         foreach (SWTag tag in tags)
         {
           string oneTag = msg.Substring(tag.Offset, tag.Length);
-          string replacement = "\" /><Hyperlink NavigateUri=\"/Views/SWBrowser.xaml/value=" +
-            HttpUtility.UrlPathEncode(tag.DisplayValue) + "&amp;amp;type=" + tag.Type + " \">" + oneTag + "</Hyperlink><Run Text=\"";
+
+          // We only do explicit tags.
+          // Tags that doesn't show anything is ignored.z
+          if (tag.DisplayValue != oneTag) continue; 
+
+          string replacement = null;
+          if (tag.Type == SWTag.TagType.Link)
+          {
+            string navigationuri = GeneralUtils.UriForWebsiteNavigation(HttpUtility.UrlPathEncode(tag.DisplayValue)).ToString();
+            navigationuri = navigationuri.Replace("&", "&amp;amp;");
+            replacement = "\" /><Hyperlink" + 
+              makeAttribute("FontSize", styles["DefaultFeedSize"]) +
+              makeAttribute("FontFamily", styles["DefaultFeedFont"]) +
+              makeAttribute("Foreground", styles["DefaultLinkColor"]) +
+              makeAttribute("NavigateUri", navigationuri) +
+              " >" + oneTag + "</Hyperlink><Run Text=\"";
+          }
+          else if (tag.Type == SWTag.TagType.Hashtag)
+          {
+            replacement = "\" /><Run" + makeAttribute("Foreground", styles["DefaultHashtagColor"]) +
+              makeAttribute("Text", tag.DisplayValue) +
+              " /><Run Text=\"";
+          }
+          else if (tag.Type == SWTag.TagType.Mention)
+          {
+            replacement = "\" /><Run" + makeAttribute("Foreground", styles["DefaultMentionsColor"]);
+
+            // Adjust for self tag
+            if (shouldBold && tag.Offset == 0)
+              replacement += makeAttribute("FontWeight", "Bold");
+
+            // Write the tag
+            replacement += makeAttribute("Text", tag.DisplayValue) + " /><Run Text=\"";
+          }
+          else
+            throw new Exception("Tag not supported by RichTextBox exception");
+
           msg = msg.Substring(0, tag.Offset) + replacement + msg.Substring(tag.Offset + tag.Length);
         }
       }
 
-      // Parse new lines and other things
-      msg = commonParse(msg, style);
+      // Replace all links
+      string linkUri = GeneralUtils.UriForWebsiteNavigation("$1").ToString().Replace("&", "&amp;amp;");
+      string linkReplacement = "\" /><Hyperlink " + makeAttribute("Foreground", styles["DeEmphasizeFeedColor"]) +
+        " NavigateUri=\"" + linkUri + "\">$1</Hyperlink><Run Text=\"";
+      Regex regex = new Regex(urlregex);
+      msg = regex.Replace(msg, linkReplacement);
 
+      // Parse new lines and other things
+      msg = commonParse(msg, ref styles);
+
+      System.Diagnostics.Debug.WriteLine(beginning + msg + end);
       return beginning + msg + end;
     }
 
     /// <summary>
     /// Parse things that every xmal must have
     /// </summary>
-    private static string commonParse(string msg, IDictionary<string, string> style = null)
+    private static string commonParse(string msg, ref IDictionary<string, string> styles)
     {
-      // Set default style
-      style = style ?? defaultStyle;
-
       // Replace all newlines
       string newlineReplacement = "\" /><LineBreak /><Run Text=\"";
       msg = msg.Replace("\n", newlineReplacement);
 
       // Finish up our styled xaml
       msg = "<Run Text=\"" + msg + "\" />";
-      msg = makeItParagraph(msg, style);
+      msg = makeItParagraph(msg, ref styles);
 
       return msg;
     }
 
-    private static string makeItParagraph(string elem, IDictionary<string, string> attribs)
+    private static string makeItParagraph(string elem, ref IDictionary<string, string> styles)
     {
-      string result = "<Paragraph";
-      if (attribs != null)
-      {
-        foreach (KeyValuePair<string, string> pair in attribs)
-          result += " " + pair.Key + "=\"" + pair.Value + "\"";
-      }
+      string result = "<Paragraph" +
+        makeAttribute("FontSize", styles["DefaultFeedSize"]) +
+        makeAttribute("FontFamily", styles["DefaultFeedFont"]) +
+        makeAttribute("Foreground", styles["DefaultFeedColor"]);
       return result + ">" + elem + "</Paragraph>";
     }
 
@@ -122,6 +142,15 @@ namespace SwipperPlus.Utils.Parsers
     {
       return str.Replace("&", "&amp;amp;").Replace("<", "&lt;").Replace(">", "&gt;")
         .Replace("\\\"", "&quot;").Replace("\"", "&quot;");
+    }
+
+    /// <summary>
+    /// Helper to generate attribute string
+    /// </summary>
+    /// <returns></returns>
+    private static string makeAttribute(string name, string value)
+    {
+      return " " + name + "=\"" + value + "\"";
     }
   }
 }

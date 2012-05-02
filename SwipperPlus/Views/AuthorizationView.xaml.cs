@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Controls;
 using System.Web;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace SwipperPlus.Views
     {
       InitializeComponent();
     }
-
+    
     /// <summary>
     /// Called when navigating to this page; Loads all the connections
     /// on the first navigation (that is, at application launch and
@@ -36,9 +37,6 @@ namespace SwipperPlus.Views
 
       // Refresh data context since user could have authorized something
       InitializePageState();
-
-      SWFacebookManager fbManager = new SWFacebookManager();
-      fbManager.FetchFeeds();
 
       // Check if we just enabled a link, if so display notification
       if (PhoneApplicationService.Current.State.ContainsKey(Constants.AUTH_NOTIFICATION))

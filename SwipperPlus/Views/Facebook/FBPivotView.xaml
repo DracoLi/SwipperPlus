@@ -7,42 +7,60 @@
     xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance"
     xmlns:MyControls="clr-namespace:SwipperPlus.Controls"
     xmlns:convert="clr-namespace:SwipperPlus.Utils.Converters"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
+    FontFamily="{StaticResource DefaultFeedFont}"
+    FontSize="{StaticResource DefaultFeedSize}"
+    Foreground="{StaticResource DefaultFeedColor}"
+    Background="{StaticResource DefaultPageBackround}"
     d:DesignHeight="480" d:DesignWidth="480"
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch" 
     d:DataContext="{d:DesignData /SampleData/SWFacebookManagerSampleData.xaml}">
 
   <UserControl.Resources>
-    <convert:NotNullToVisibilityConverter x:Name="NotNullConverter"/>
-    <convert:NullToVisibilityConverter x:Name="NullConverter"/>
-    <convert:DateTimeToTwitterTimeConverter x:Name="TwitterTimeConverter"/>
+  	<convert:StringToVisibilityConverter x:Key="StringToVisibilityConverter2"/>
+  	<convert:StringToVisibilityConverter x:Key="StringToVisibilityConverter1"/>
+  	<convert:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter1"/>
+  	<convert:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter2"/>
+  	<convert:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+  	<convert:DateTimeToTwitterTimeConverter x:Name="TwitterTimeConverter" />
+  	<convert:LinkToVisibilityConverter x:Name="LinkConverter" />
+  	<convert:ImageToVisibilityConverter x:Name="ImageConverter" />
+  	<convert:UriForBrowserConverter x:Name="UriForBrowserConverter" />
+  	<convert:IntToVisiblityConverter x:Name="IntToVisiblityConverter" />
   </UserControl.Resources>
   
   <Grid x:Name="LayoutRoot">
-    <ListBox ItemsSource="{Binding Feeds}">
-      <ListBox.ItemContainerStyle>
-        <Style TargetType="ListBoxItem">
-          <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-        </Style>
-      </ListBox.ItemContainerStyle>
-      <ListBox.ItemTemplate>
+    <toolkit:LongListSelector 
+      ItemsSource="{Binding Feeds}" 
+      ScrollingStarted="LongListSelector_ScrollingStarted">
+      <toolkit:LongListSelector.ItemTemplate>
         <DataTemplate>
-          <!-- Outer layer -->
           <StackPanel>
             <!-- Inner Content Layer -->
-            <Grid Margin="15,10,15,10" HorizontalAlignment="Stretch">
+            <Grid Margin="15" HorizontalAlignment="Stretch">
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="90" />
+                <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*"/>
               </Grid.ColumnDefinitions>
-              <MyControls:PlaceImage Margin="0,7,15,0" Grid.Column="0"
-                                     VerticalAlignment="Top" 
-                                     PlaceholderSource="/images/y_normal.png"
-                                     Source="{Binding Path=SourceUser.Icon}" />
+
+              <StackPanel Orientation="Vertical" Grid.Column="0">
+                <!-- Feed user's profile image -->
+                <MyControls:PlaceImage Margin="0,4,13,0" Grid.Column="0"
+                                       VerticalAlignment="Top" 
+                                       PlaceholderSource="/images/y_normal.png"
+                                       Source="{Binding Path=SourceUser.Icon}" />
+
+                <!-- Likes counter below images -->
+                <!--
+                <StackPanel Orientation="Horizontal"
+                            Visibility="{Binding SocialProperties.LikesCount, Converter={StaticResource IntToVisiblityConverter}}">
+                  <TextBlock Text="{Binding SocialProperties.LikesCount}" />
+                  <TextBlock Text=" Likes" />
+                </StackPanel>
+                -->
+              </StackPanel>
               <!--
               <MyControls:PlaceImage.Clip>
                 <RectangleGeometry RadiusX="6" RadiusY="6" Rect="0,0,,48,48"/>
@@ -56,25 +74,113 @@
               </Image.Clip>
             </Image>
             -->
-              <StackPanel Grid.Column="1">
+              <StackPanel Grid.Column="1" Orientation="Vertical">
+                
+                <!-- Name Line (Visible when no description) -->
+                <toolkit:WrapPanel Visibility="{Binding XmlDescription, Converter={StaticResource NullToVisibilityConverter}}" Orientation="Horizontal">
+                  <TextBlock HorizontalAlignment="Left" 
+                             Text="{Binding SourceUser.DisplayName}"
+                             Foreground="{StaticResource EmphasizeFeedColor}" 
+                             FontWeight="Bold" 
+                             TextWrapping="Wrap" />
+
+                  <!-- Conversation Add-on-->
+                  <StackPanel Visibility="{Binding TargetUser, Converter={StaticResource NotNullToVisibilityConverter1}}"
+                              Orientation="Horizontal">
+                    <Image Source="/images/appbar.transport.play.rest.png" Margin="0,-4,0,0" Width="28" Height="28" />
+                    <TextBlock Text="{Binding TargetUser.DisplayName}"
+                               Foreground="{StaticResource EmphasizeFeedColor}" 
+                               FontWeight="Bold"
+                               TextWrapping="Wrap" />
+                  </StackPanel>
+
+                </toolkit:WrapPanel>
+                
+                <!-- Core Content Line -->
                 <Grid>
                   <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                   </Grid.ColumnDefinitions>
-                  <TextBlock Grid.Column="0" Text="{Binding SourceUser.DisplayName, Mode=OneWay}" 
-                             Visibility="{Binding Path=Description, Mode=OneWay, Converter={StaticResource NullConverter}}" 
-                             Foreground="{StaticResource PhoneAccentBrush}" FontWeight="Bold" />
-                  <MyControls:SWRichTextBox  Grid.Column="0" Text="{Binding Path=XmlDescription}"
-                                             Visibility="{Binding Path=Description, Converter={StaticResource NotNullConverter}}" Margin="-12,0,0,0" />
-                  <TextBlock Grid.Column="1" Text="{Binding Date, Mode=OneWay, Converter={StaticResource TwitterTimeConverter}}" />
+                  
+                  <!-- Core Content -->
+                  <StackPanel Grid.Column="0">
+                    <!-- Displays Description -->
+                    <MyControls:SWRichTextBox Visibility="{Binding XmlDescription, Converter={StaticResource StringToVisibilityConverter2}}"
+                                              Text="{Binding XmlDescription}" 
+                                              Margin="-12,0,0,0" />
+
+                    <!-- Displays Message -->
+                    <MyControls:SWRichTextBox Text="{Binding XmlMessage}"
+                                              Visibility="{Binding XmlMessage, Converter={StaticResource StringToVisibilityConverter1}}"
+                                              Margin="-12,0,0,0" />
+                  </StackPanel>
                 </Grid>
-                <MyControls:SWRichTextBox Visibility="{Binding Path=Message, Mode=OneWay}" Text="{Binding XmlMessage}" Margin="-12,0,0,0" />
+                
+                <!-- Attached Image -->
+                <Button Visibility="{Binding Attachment, Converter={StaticResource ImageConverter}}"
+                        Margin="0,10,0,10"
+                        Style="{StaticResource ImageBorderButton}"
+                        toolkit:TiltEffect.IsTiltEnabled="True"
+                        Tag="{Binding Attachment.Source}"
+                        Click="ImageAttachment_Click">
+                  <Button.Content>
+                    <Image HorizontalAlignment="Left"
+                           Source="{Binding Path=Attachment.Icon}"
+                           MaxWidth="300"/>
+                  </Button.Content>
+                </Button>
+                
+                <!-- Attached Clickable Link -->
+                <Button Style="{StaticResource LinkButtonStyle}"
+                        Margin="0,10,0,0"
+                        Click="Attachment_Click"
+                        Tag="{Binding Attachment.Source}"
+                        Visibility="{Binding Attachment, Converter={StaticResource LinkConverter}}"
+                        toolkit:TiltEffect.IsTiltEnabled="True">
+                  <Button.Content>
+                    <Grid >
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                      </Grid.ColumnDefinitions>
+                      <!-- Link Icon -->
+                      <Image Grid.Column="0" 
+                             Margin="0,0,7,0"
+                             VerticalAlignment="Top" 
+                             MaxWidth="100"
+                             Visibility="{Binding Attachment.Icon, Converter={StaticResource NotNullToVisibilityConverter2}}"
+                             Source="{Binding Attachment.Icon}" />
+
+                      <!-- Link content -->
+                      <StackPanel Grid.Column="1"
+                                  Orientation="Vertical"
+                                  Margin="0">
+                        <!-- Name of the Link, just the way we like it -->
+                        <TextBlock Text="{Binding Attachment.Name}" 
+                                   TextWrapping="Wrap"
+                                   Foreground="{StaticResource DefaultLinkColor}"
+                                   Margin="0"/>
+                        <!-- Description of the Link -->
+                        <TextBlock Text="{Binding Attachment.Description}" 
+                                   TextWrapping="Wrap" 
+                                   FontSize="{StaticResource DefaultLinkDescriptionSize}" 
+                                   Foreground="{StaticResource DeEmphasizeFeedColor}"
+                                   Margin="0,3,0,0" />
+                      </StackPanel>
+                    </Grid>
+                  </Button.Content>
+                </Button>
+                <!-- End of Link Attachment-->
               </StackPanel>
+              <!-- End of Right Side-->
             </Grid>
+            <Border BorderBrush="{StaticResource DefaultSeparatorColor}" 
+                    BorderThickness="0,0,0,1"
+                    Height="1"/>
           </StackPanel>
         </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
+      </toolkit:LongListSelector.ItemTemplate>
+    </toolkit:LongListSelector>
   </Grid>
 </UserControl>

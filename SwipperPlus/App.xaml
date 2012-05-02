@@ -3,10 +3,136 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone" 
-    x:Class="SwipperPlus.App"
-    >
+    xmlns:System="clr-namespace:System;assembly=mscorlib" 
+    x:Class="SwipperPlus.App">
     
     <!--Application Resources-->
+  <Application.Resources>
+    
+    <!-- Feed Styles -->
+    <FontFamily x:Key="DefaultFeedFont">Tomaho</FontFamily>
+    <System:Double x:Key="DefaultFeedSize">18</System:Double>
+    <SolidColorBrush x:Key="DefaultFeedColor" Color="White" />
+    <SolidColorBrush x:Key="DeEmphasizeFeedColor" Color="#adafb3" />
+    <SolidColorBrush x:Key="EmphasizeFeedColor" Color="#3277ba" />
+    
+    <!-- Mentions -->
+    <SolidColorBrush x:Key="DefaultMentionsColor" Color="#3277ba" />
+    
+    <!-- HashTags -->
+    <SolidColorBrush x:Key="DefaultHashtagColor" Color="#adafb3" />
+    
+    <!-- Page Styles -->
+    <SolidColorBrush x:Key="DefaultPageBackround" Color="Black" />
+    <SolidColorBrush x:Key="DefaultPageForeground" Color="White" />
+    
+    <!-- Link Styles -->
+    <SolidColorBrush x:Key="DefaultLinkColor" Color="#4881c8" />
+    <System:Double x:Key="DefaultLinkDescriptionSize">16</System:Double>
+    <Style x:Key="LinkButtonStyle" TargetType="Button">
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="VerticalContentAlignment" Value="Bottom" />
+      <Setter Property="FontFamily" Value="{StaticResource DefaultFeedFont}" />
+      <Setter Property="FontSize" Value="{StaticResource DefaultFeedSize}" />
+      <Setter Property="Foreground" Value="{StaticResource DefaultLinkColor}" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid Background="Transparent">
+              <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                  <VisualState x:Name="Normal"/>
+                  <VisualState x:Name="MouseOver"/>
+                  <VisualState x:Name="Pressed">
+                    <Storyboard>
+                      <!--
+                      <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="ButtonBackground">
+                        <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PhoneForegroundBrush}"/>
+                      </ObjectAnimationUsingKeyFrames>
+                      -->
+                    </Storyboard>
+                  </VisualState>
+                  <VisualState x:Name="Disabled">
+                    <Storyboard>
+                      <!--
+                      <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="ButtonBackground">
+                        <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PhoneDisabledBrush}"/>
+                      </ObjectAnimationUsingKeyFrames>
+                      -->
+                    </Storyboard>
+                  </VisualState>
+                </VisualStateGroup>
+              </VisualStateManager.VisualStateGroups>
+              <ContentControl x:Name="ContentContainer" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" Padding="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    
+    <!-- Others -->
+    <SolidColorBrush x:Key="DefaultSeparatorColor" Color="#FF2B2B2B" />
+    <Style x:Key="EmptyButton" TargetType="Button">
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Grid Background="Transparent">
+              <VisualStateManager.VisualStateGroups>
+                <VisualStateGroup x:Name="CommonStates">
+                  <VisualState x:Name="Normal"/>
+                  <VisualState x:Name="MouseOver"/>
+                  <VisualState x:Name="Pressed">
+                  </VisualState>
+                  <VisualState x:Name="Disabled">
+                  </VisualState>
+                </VisualStateGroup>
+              </VisualStateManager.VisualStateGroups>
+              <ContentControl x:Name="ContentContainer" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" Padding="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="ImageBorderButton" TargetType="Button">
+    	<Setter Property="Background" Value="Transparent"/>
+      <Setter Property="BorderBrush" Value="#666666"/>
+    	<Setter Property="BorderThickness" Value="1"/>
+    	<Setter Property="Template">
+    		<Setter.Value>
+    			<ControlTemplate TargetType="Button">
+    				<Grid Background="Transparent">
+    					<VisualStateManager.VisualStateGroups>
+    						<VisualStateGroup x:Name="CommonStates">
+    							<VisualState x:Name="Normal"/>
+    							<VisualState x:Name="MouseOver"/>
+    							<VisualState x:Name="Pressed">
+    								<Storyboard>
+                      <!--
+    									<ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Background" Storyboard.TargetName="ButtonBackground">
+    										<DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PhoneForegroundBrush}"/>
+    									</ObjectAnimationUsingKeyFrames>
+    									-->
+    								</Storyboard>
+    							</VisualState>
+    							<VisualState x:Name="Disabled">
+    							</VisualState>
+    						</VisualStateGroup>
+    					</VisualStateManager.VisualStateGroups>
+    					<Border x:Name="ButtonBackground" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="0" Margin="{StaticResource PhoneTouchTargetOverhang}">
+    						<ContentControl x:Name="ContentContainer" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" Padding="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+    					</Border>
+    				</Grid>
+    			</ControlTemplate>
+    		</Setter.Value>
+    	</Setter>
+    </Style>
+  </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>
         <!--Required object that handles lifetime events for the application-->

@@ -47,6 +47,15 @@ namespace SwipperPlus.Model.Facebook
     public string Message { get; set; }
 
     /// <summary>
+    /// This is soley used for displaying this feed
+    /// Without this we cannot bind the visibility property of the message
+    ///  See FBPivotView
+    /// </summary>
+    public bool HasMessage { get; set; }
+
+    public IList<SWTag> MessageTags { get; set; }
+
+    /// <summary>
     /// This corresponds to an action
     /// </summary>
     public string Description { get; set; }

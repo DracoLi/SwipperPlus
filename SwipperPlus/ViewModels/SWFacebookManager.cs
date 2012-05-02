@@ -18,7 +18,7 @@ namespace SwipperPlus.ViewModel
     /// <summary>
     /// Every facebook feed for the user
     /// </summary>
-    public ObservableCollection<FacebookFeed> Feeds { private set; get; }
+    public ObservableCollection<FacebookFeedList> Feeds { set; get; }
 
     /// <summary>
     /// Title of this social link, used by pivot item header
@@ -50,7 +50,7 @@ namespace SwipperPlus.ViewModel
     public override void FetchFeeds()
     {
       // Do this so that we know we are fetching new feeds
-      Feeds = new ObservableCollection<FacebookFeed>();
+      Feeds = new ObservableCollection<FacebookFeedList>();
 
       string q1, q2, q3;
       getQueries(out q1, out q2, out q3);
@@ -63,7 +63,7 @@ namespace SwipperPlus.ViewModel
     /// </summary>
     public override void UpdateFeeds()
     {
-      long lastTime = GeneralUtils.DateTimeToUnixTimestamp(Feeds[0].Date);
+      long lastTime = GeneralUtils.DateTimeToUnixTimestamp(Feeds[0][0].Date);
       string q1, q2, q3;
       getQueries(out q1, out q2, out q3, lastTime);
       string[] queries = { q1, q2, q3 };
@@ -115,16 +115,22 @@ namespace SwipperPlus.ViewModel
 
       // Determine current feed status
       FeedStatus status = FeedStatus.New;
-      if (Feeds.Count != 0)
+      if (Feeds.Count > 0 && Feeds[0].Count > 0)
       {
         status = FeedStatus.Updated;
-        Feeds = new ObservableCollection<FacebookFeed>();
+        Feeds = new ObservableCollection<FacebookFeedList>();
       }
 
       // Look through all feeds, parsing feeds one by one
       IEnumerable<JToken> rawfeeds = rawFeeds[0]["fql_result_set"].Children();
+      FacebookFeedList list = new FacebookFeedList();
       foreach (JToken oneResult in rawfeeds)
-        Feeds.Add(FacebookParser.ParseFeed(oneResult, People));
+      {
+        FacebookFeed feed = FacebookParser.ParseFeed(oneResult, People);
+        if (feed != null)
+          list.Add(feed);
+      }
+      Feeds.Add(list);
 
       // Raise feeds parsed event
       OnRaiseFeedsEvent(new SocialLinkEventArgs(status));

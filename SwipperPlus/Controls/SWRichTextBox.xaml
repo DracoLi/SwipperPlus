@@ -4,10 +4,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeNormal}"
-    Foreground="{StaticResource PhoneForegroundBrush}"
-    d:DesignHeight="480" d:DesignWidth="480">
+    FontFamily="{StaticResource DefaultFeedFont}"
+    FontSize="{StaticResource DefaultFeedSize}"
+    Background="{StaticResource DefaultPageBackround}"
+    Foreground="{StaticResource DefaultPageForeground}"
+             d:DesignHeight="480" d:DesignWidth="480">
     
     <Grid>
        <RichTextBox x:Name="richTextBox" TextWrapping="Wrap" />
