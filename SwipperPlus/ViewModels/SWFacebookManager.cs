@@ -21,6 +21,11 @@ namespace SwipperPlus.ViewModel
     public ObservableCollection<FacebookFeedList> Feeds { set; get; }
 
     /// <summary>
+    /// This specifies the amount of feeds to get when user want more
+    /// </summary>
+    private int amountToGrab = 10;
+
+    /// <summary>
     /// Title of this social link, used by pivot item header
     /// </summary>
     public override string Title
@@ -50,8 +55,7 @@ namespace SwipperPlus.ViewModel
     public override void FetchFeeds()
     {
       // Do this so that we know we are fetching new feeds
-      Feeds = new ObservableCollection<FacebookFeedList>();
-
+      CurrentAction = FeedAction.New;
       string q1, q2, q3;
       getQueries(out q1, out q2, out q3);
       string[] queries = { q1, q2, q3 };
@@ -59,15 +63,26 @@ namespace SwipperPlus.ViewModel
     }
 
     /// <summary>
-    /// Get only new feeds from facebook
+    /// Get more feeds
     /// </summary>
-    public override void UpdateFeeds()
+    /// <param name="amount"></param>
+    public override void GetMoreFeeds()
     {
-      long lastTime = GeneralUtils.DateTimeToUnixTimestamp(Feeds[0][0].Date);
-      string q1, q2, q3;
-      getQueries(out q1, out q2, out q3, lastTime);
-      string[] queries = { q1, q2, q3 };
-      fb.QueryAsync(queries);
+      // Update new feeds if we have some feeds already
+      if (Feeds != null && Feeds.Count > 0 && Feeds[0].Count > 0)
+      {
+        long lastTime = GeneralUtils.DateTimeToUnixTimestamp(Feeds[0][Feeds.Count-1].Date);
+        CurrentAction = FeedAction.More;
+        string q1, q2, q3;
+        getQueries(out q1, out q2, out q3, lastTime);
+        string[] queries = { q1, q2, q3 };
+        fb.QueryAsync(queries);
+      }
+      else
+      {
+        // If we have no feeds right now, just fetch instead
+        FetchFeeds();
+      }
     }
 
     public override void SaveFeeds()
@@ -102,7 +117,7 @@ namespace SwipperPlus.ViewModel
       System.Diagnostics.Debug.WriteLine(e.GetResultData().ToString());
       JArray rawFeeds = JArray.Parse(e.GetResultData().ToString());
 
-      // Update our people list
+      // Update our people list (add person if not in there already)
       for (int i = 1; i < 3; i++)
       {
         foreach (JToken person in rawFeeds[i]["fql_result_set"].Children())
@@ -114,26 +129,35 @@ namespace SwipperPlus.ViewModel
       }
 
       // Determine current feed status
-      FeedStatus status = FeedStatus.New;
-      if (Feeds.Count > 0 && Feeds[0].Count > 0)
+      FacebookFeedList list = null;
+      if (CurrentAction == FeedAction.New)
       {
-        status = FeedStatus.Updated;
         Feeds = new ObservableCollection<FacebookFeedList>();
+        list = new FacebookFeedList();
+      }
+      else if (CurrentAction == FeedAction.More)
+      {
+        list = Feeds[0];
       }
 
       // Look through all feeds, parsing feeds one by one
       IEnumerable<JToken> rawfeeds = rawFeeds[0]["fql_result_set"].Children();
-      FacebookFeedList list = new FacebookFeedList();
       foreach (JToken oneResult in rawfeeds)
       {
         FacebookFeed feed = FacebookParser.ParseFeed(oneResult, People);
-        if (feed != null)
+
+        // Check if we discarded this feed when parsing by setting it to null
+        if (list != null)
           list.Add(feed);
       }
-      Feeds.Add(list);
+
+      // Add feeds to our list only if we getting new ones
+      //  Else it is already added
+      if (CurrentAction == FeedAction.New)
+        Feeds.Add(list);
 
       // Raise feeds parsed event
-      OnRaiseFeedsEvent(new SocialLinkEventArgs(status));
+      OnRaiseFeedsEvent(new SocialLinkEventArgs(CurrentAction));
     }
 
     private void getQueries(out string q1, out string q2, out string q3, long lastTime = 0)
@@ -142,12 +166,22 @@ namespace SwipperPlus.ViewModel
             "comments, likes, message_tags, description, description_tags, type FROM stream " + 
             "WHERE filter_key in (SELECT filter_key FROM stream_filter WHERE uid=me() " +
             "AND type='newsfeed') AND is_hidden = 0 ";
-      if (lastTime > 0)
-        q1 += "AND created_time > " + lastTime + " ";
-      q1 += "ORDER BY created_time DESC ";
-      if (lastTime == 0)
-        q1 += "LIMIT " + GeneralSettings.FeedsToGet;
-
+      
+      // Fetch more feeds
+      if (CurrentAction == FeedAction.More && lastTime > 0)
+      {
+        q1 += "AND created_time < " + lastTime + " ";
+        q1 += "ORDER BY created_time DESC ";
+        q1 += "LIMIT " + GeneralSettings.AdditionalFeedsToGet + " ";
+      }
+      
+      // Set limit on refreshing feeds
+      if (CurrentAction == FeedAction.New)
+      {
+        q1 += "ORDER BY created_time DESC ";
+        q1 += "LIMIT " + GeneralSettings.InitialFeedsToGet + " ";
+      }
+      
       q2 = "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT actor_id FROM #query0)";
       q3 = "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT target_id FROM #query0)";
     }

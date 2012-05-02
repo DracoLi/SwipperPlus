@@ -133,7 +133,13 @@ namespace SwipperPlus.Utils.Parsers
           
           // Use media href instead of attachment href
           if (tokenHasValue(media["href"]))
+          {
             fbAttach.Source = new Uri((string)media["href"]);
+
+            // Adjust source if attachment is a facebook image
+            if (fbAttach.Type == FacebookAttachment.MediaType.Image)
+              fbAttach.Source = guessLargeImageFromIcon(fbAttach.Icon);
+          }
 
           // Add description if this attachment is a link
           if (fbAttach.Type == FacebookAttachment.MediaType.Link &&
@@ -196,7 +202,7 @@ namespace SwipperPlus.Utils.Parsers
       FeedType result = FeedType.NotSupported;
 
       // Figure out type from supplied type param
-      if      (type == 56 && feed.TargetUser != null)      result = FeedType.Conversation;
+      if      (type == 56 && feed.TargetUser != null)     result = FeedType.Conversation;
       else if ((type == 80 || type == 128 || type == 247) && 
                 feed.Attachment != null)                  result = FeedType.Attachment;
       else if (type == 46 || feed.Message != null)        result = FeedType.Text;
@@ -263,7 +269,19 @@ namespace SwipperPlus.Utils.Parsers
     /// </summary>
     private static string removeTabs(string str)
     {
-      return str.Replace("\\r", "");
+      return str.Replace("\t", "");
+    }
+
+    /// <summary>
+    /// Guess the link of the large image from the icon
+    /// </summary>
+    private static Uri guessLargeImageFromIcon(Uri icon)
+    {
+      string link = icon.ToString();
+      string[] typesToReplace = { "_s.", "_t.", "_q." };
+      foreach (string type in typesToReplace)
+        link = link.Replace(type, "_n.");
+      return new Uri(link);
     }
   }
 }

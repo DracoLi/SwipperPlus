@@ -15,17 +15,36 @@
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <StackPanel x:Name="LayoutRoot" Background="Transparent">
-      
-      <phone:WebBrowser Height="Auto" x:Name="dracoBrowser" IsScriptEnabled="True" Navigating="authBrowser_Navigating" LoadCompleted="authBrowser_LoadCompleted" Visibility="Visible" Grid.Row="0"/>
-      <StackPanel Name="loadingView" VerticalAlignment="Top" Background="{StaticResource PhoneBackgroundBrush}" Grid.Row="0">
-        <toolkit:PerformanceProgressBar x:Name="progressBar" IsIndeterminate="False" Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top" />
-        <TextBlock Name="loadingText" Text="Loading Website..." Foreground="{StaticResource PhoneContrastBackgroundBrush}" VerticalAlignment="Bottom" TextAlignment="Left" FontSize="18" />
-      </StackPanel>
-      
-  </StackPanel>
- 
-    <!--Sample code showing usage of ApplicationBar-->
+  <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+    <StackPanel Name="loadingView"
+                  Grid.Row="0"
+                  VerticalAlignment="Top" 
+                  Background="{StaticResource PhoneBackgroundBrush}">
+      <toolkit:PerformanceProgressBar x:Name="progressBar" 
+                                        IsIndeterminate="False" 
+                                        Foreground="{StaticResource PhoneAccentBrush}" 
+                                        VerticalAlignment="Top" />
+      <TextBlock Name="loadingText" 
+                   Text="Loading Website..." 
+                   Foreground="{StaticResource PhoneContrastBackgroundBrush}" 
+                   VerticalAlignment="Bottom" 
+                   TextAlignment="Left" 
+                   FontSize="18" />
+    </StackPanel>
+    <phone:WebBrowser x:Name="dracoBrowser" 
+                        Grid.Row="1" 
+                        Height="Auto"   
+                        IsScriptEnabled="True" 
+                        Navigating="authBrowser_Navigating" 
+                        LoadCompleted="authBrowser_LoadCompleted" 
+                        Visibility="Collapsed" />
+  </Grid>
+
+  <!--Sample code showing usage of ApplicationBar-->
     <!--<phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
             <shell:ApplicationBarIconButton IconUri="/Images/appbar_button1.png" Text="Button 1"/>

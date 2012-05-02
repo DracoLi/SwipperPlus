@@ -28,10 +28,11 @@ namespace SwipperPlus.Utils.Parsers
       results["DefaultFeedFont"] = "Tomaho"; // currentResources["DefaultFeedFont"].ToString();
       results["DefaultFeedColor"] = "White"; // currentResources["DefaultFeedColor"].ToString();
       results["DeEmphasizeFeedColor"] = "#adafb3"; // currentResources["DeEmphasizeFeedColor"].ToString();
-      results["EmphasizeFeedColor"] = "#3277ba"; // currentResources["EmphasizeFeedColor"].ToString();
-      results["DefaultLinkColor"] = "#4881c8"; // currentResources["DefaultLinkColor"].ToString();
+      results["EmphasizeFeedColor"] = "#5696d4"; // currentResources["EmphasizeFeedColor"].ToString();
+      results["DefaultLinkColor"] = "#9fa1a5"; // currentResources["DefaultLinkColor"].ToString();
       results["DefaultMentionsColor"] = "#3277ba"; // currentResources["DefaultMentionsColor"].ToString();
       results["DefaultHashtagColor"] = "#adafb3"; // currentResources["DefaultHashtagColor"].ToString();
+      results["DefaultDescriptionColor"] = "#d3d1d1";
       return results;
     }
 
@@ -42,7 +43,7 @@ namespace SwipperPlus.Utils.Parsers
     /// <param name="tags">Tags in the message</param>
     /// <param name="me">The tag that is the source person of the feed</param>
     /// <returns></returns>
-    internal static string ParseStringToXamlWithTags(string msg, IList<SWTag> tags = null, bool shouldBold = false)
+    internal static string ParseStringToXamlWithTags(string msg, IList<SWTag> tags = null, bool isDescription = false)
     {
       IDictionary<string, string> styles = GetDefaultStyles();
 
@@ -83,7 +84,7 @@ namespace SwipperPlus.Utils.Parsers
             replacement = "\" /><Run" + makeAttribute("Foreground", styles["DefaultMentionsColor"]);
 
             // Adjust for self tag
-            if (shouldBold && tag.Offset == 0)
+            if (isDescription && tag.Offset == 0)
               replacement += makeAttribute("FontWeight", "Bold");
 
             // Write the tag
@@ -98,12 +99,14 @@ namespace SwipperPlus.Utils.Parsers
 
       // Replace all links
       string linkUri = GeneralUtils.UriForWebsiteNavigation("$1").ToString().Replace("&", "&amp;amp;");
-      string linkReplacement = "\" /><Hyperlink " + makeAttribute("Foreground", styles["DeEmphasizeFeedColor"]) +
+      string linkReplacement = "\" /><Hyperlink " + makeAttribute("Foreground", styles["DefaultLinkColor"]) +
         " NavigateUri=\"" + linkUri + "\">$1</Hyperlink><Run Text=\"";
       Regex regex = new Regex(urlregex);
       msg = regex.Replace(msg, linkReplacement);
 
       // Parse new lines and other things
+      if (isDescription)
+        styles["DefaultFeedColor"] = styles["DefaultDescriptionColor"];
       msg = commonParse(msg, ref styles);
 
       System.Diagnostics.Debug.WriteLine(beginning + msg + end);

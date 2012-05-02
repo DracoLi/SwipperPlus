@@ -39,12 +39,12 @@ namespace SwipperPlus.ViewModel
     public override void FetchFeeds()
     {
       Feeds = new ObservableCollection<SWTwitterFeed>();
-      twitter.ListTweetsOnHomeTimeline(GeneralSettings.FeedsToGet, tw_HandleCallback);
+      twitter.ListTweetsOnHomeTimeline(GeneralSettings.InitialFeedsToGet, tw_HandleCallback);
     }
 
-    public override void UpdateFeeds()
+    public override void GetMoreFeeds()
     {
-      twitter.ListTweetsOnHomeTimelineSince(Feeds[0].ID, tw_HandleCallback);
+      throw new NotImplementedException();
     }
 
     public override void SaveFeeds()
@@ -69,12 +69,8 @@ namespace SwipperPlus.ViewModel
       if (response.StatusCode == HttpStatusCode.OK)
       {
         // Determine feed status
-        FeedStatus status = FeedStatus.New;
-        ObservableCollection<SWTwitterFeed> oldFeeds = null;
-        if (Feeds.Count != 0)
+        if (CurrentAction == FeedAction.New)
         {
-          status = FeedStatus.Updated;
-          oldFeeds = Feeds;
           Feeds = new ObservableCollection<SWTwitterFeed>();
         }
 
@@ -82,12 +78,7 @@ namespace SwipperPlus.ViewModel
         foreach (TwitterStatus tweet in statuses)
           Feeds.Add(TwitterParser.ParseTweet(tweet));
 
-        // Add in the old feeds if its an update
-        if (oldFeeds != null)
-          foreach (SWTwitterFeed st in oldFeeds)
-            Feeds.Add(st);
-
-        OnRaiseFeedsEvent(new SocialLinkEventArgs(status));
+        OnRaiseFeedsEvent(new SocialLinkEventArgs(CurrentAction));
       }
       else
       {

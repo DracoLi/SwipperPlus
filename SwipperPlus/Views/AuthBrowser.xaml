@@ -17,10 +17,24 @@
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <StackPanel x:Name="LayoutRoot" Background="Transparent">
-        <phone:WebBrowser Height="Auto" x:Name="authBrowser" IsScriptEnabled="True" Navigating="authBrowser_Navigating" LoadCompleted="authBrowser_LoadCompleted" Visibility="Visible" Grid.Row="0"/>
-        <StackPanel Name="loadingView" VerticalAlignment="Top" Background="{StaticResource PhoneBackgroundBrush}" Grid.Row="0">
-          <toolkit:PerformanceProgressBar x:Name="progressBar" IsIndeterminate="False" Foreground="{StaticResource PhoneAccentBrush}" VerticalAlignment="Top" />
-          <TextBlock Name="loadingText" Text="Loading Website..." Foreground="{StaticResource PhoneContrastBackgroundBrush}" VerticalAlignment="Bottom" TextAlignment="Left" FontSize="18" />
+        <phone:WebBrowser Height="Auto" x:Name="authBrowser" 
+                          IsScriptEnabled="True" 
+                          Navigating="authBrowser_Navigating" 
+                          LoadCompleted="authBrowser_LoadCompleted" 
+                          Visibility="Visible" Grid.Row="0"/>
+        <StackPanel Name="loadingView" 
+                    VerticalAlignment="Top" 
+                    Grid.Row="0">
+          <toolkit:PerformanceProgressBar x:Name="progressBar" 
+                                          IsIndeterminate="False" 
+                                          Foreground="{StaticResource PhoneAccentBrush}" 
+                                          VerticalAlignment="Top" />
+          <TextBlock Name="loadingText" 
+                     Text="Loading Website..." 
+                     Foreground="{StaticResource PhoneContrastBackgroundBrush}" 
+                     VerticalAlignment="Bottom" 
+                     TextAlignment="Left"
+                     FontSize="18" />
         </StackPanel>
     </StackPanel>
  

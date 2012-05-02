@@ -13,6 +13,7 @@ namespace SwipperPlus.Settings
 {
   public static class GeneralSettings
   {
-    public const int FeedsToGet = 30;
+    public const int InitialFeedsToGet = 30;
+    public const int AdditionalFeedsToGet = 10;
   }
 }

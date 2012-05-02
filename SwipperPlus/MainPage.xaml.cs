@@ -43,7 +43,7 @@ namespace SwipperPlus
     protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
     {
  	    base.OnNavigatedTo(e);
-      if (SWFacebookSettings.IsConnected())
+      if (SWFacebookSettings.IsConnected() && fbManager.Feeds == null)
       {
         fbManager = new SWFacebookManager();
         fbManager.FeedsChanged += new EventHandler<SocialLinkEventArgs>(fbManager_FeedsChanged);

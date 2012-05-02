@@ -25,7 +25,8 @@ namespace SwipperPlus.Views
       string type = NavigationContext.QueryString["type"];
       string value = NavigationContext.QueryString["value"];
 
-      if (type == "link")
+      // This is a link and no site has been loaded yet
+      if (type == "link" && dracoBrowser.Visibility == Visibility.Collapsed)
       {
         dracoBrowser.Navigate(new Uri(value));
       }

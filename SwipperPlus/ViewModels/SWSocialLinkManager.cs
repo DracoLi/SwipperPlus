@@ -4,7 +4,7 @@ using SwipperPlus.Model;
 
 namespace SwipperPlus.ViewModel
 {
-  public enum FeedStatus { New, Updated, Deleted }
+  public enum FeedAction { New, More }
 
   public abstract class SWSocialLinkManager
   {
@@ -12,15 +12,17 @@ namespace SwipperPlus.ViewModel
 
     public abstract string Title { get; }
 
+    public FeedAction CurrentAction { get; set; }
+
     /// <summary>
     /// Fetch all feeds from this social link
     /// </summary>
     public abstract void FetchFeeds();
 
     /// <summary>
-    /// Update current feeds by fetching only newer feeds from server
+    /// Fetch some more feeds
     /// </summary>
-    public abstract void UpdateFeeds();
+    public abstract void GetMoreFeeds();
 
     /// <summary>
     /// Save current feeds to persistant storange
@@ -60,7 +62,7 @@ namespace SwipperPlus.ViewModel
       get { return error; }
     }
 
-    public readonly FeedStatus Status;
+    public readonly FeedAction Action;
 
     /// <summary>
     /// A invalid callback instantiates an error
@@ -75,9 +77,9 @@ namespace SwipperPlus.ViewModel
     /// <summary>
     /// A valid callback specified feed status
     /// </summary>
-    public SocialLinkEventArgs(FeedStatus status)
+    public SocialLinkEventArgs(FeedAction action)
     {
-      Status = status;
+      Action = action;
     }
   }
 }

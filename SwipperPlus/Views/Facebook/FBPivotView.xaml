@@ -78,6 +78,8 @@
                 
                 <!-- Name Line (Visible when no description) -->
                 <toolkit:WrapPanel Visibility="{Binding XmlDescription, Converter={StaticResource NullToVisibilityConverter}}" Orientation="Horizontal">
+                  
+                  <!-- Name -->
                   <TextBlock HorizontalAlignment="Left" 
                              Text="{Binding SourceUser.DisplayName}"
                              Foreground="{StaticResource EmphasizeFeedColor}" 
@@ -118,16 +120,17 @@
                 </Grid>
                 
                 <!-- Attached Image -->
-                <Button Visibility="{Binding Attachment, Converter={StaticResource ImageConverter}}"
-                        Margin="0,10,0,10"
+                <Button Margin="0,2,0,0"
                         Style="{StaticResource ImageBorderButton}"
                         toolkit:TiltEffect.IsTiltEnabled="True"
                         Tag="{Binding Attachment.Source}"
-                        Click="ImageAttachment_Click">
+                        Click="ImageAttachment_Click"
+                        Visibility="{Binding Attachment, Converter={StaticResource ImageConverter}}">
                   <Button.Content>
                     <Image HorizontalAlignment="Left"
-                           Source="{Binding Path=Attachment.Icon}"
-                           MaxWidth="300"/>
+                           Source="{Binding Attachment.Icon}"
+                           MaxWidth="300"
+                           Margin="0"/>
                   </Button.Content>
                 </Button>
                 

@@ -15,6 +15,7 @@
     <SolidColorBrush x:Key="DefaultFeedColor" Color="White" />
     <SolidColorBrush x:Key="DeEmphasizeFeedColor" Color="#adafb3" />
     <SolidColorBrush x:Key="EmphasizeFeedColor" Color="#3277ba" />
+    <SolidColorBrush x:Key="DefaultDescriptionColor" Color="#adadae" />
     
     <!-- Mentions -->
     <SolidColorBrush x:Key="DefaultMentionsColor" Color="#3277ba" />
@@ -101,8 +102,10 @@
     </Style>
     <Style x:Key="ImageBorderButton" TargetType="Button">
     	<Setter Property="Background" Value="Transparent"/>
-      <Setter Property="BorderBrush" Value="#666666"/>
+      <Setter Property="BorderBrush" Value="{StaticResource DefaultSeparatorColor}"/>
     	<Setter Property="BorderThickness" Value="1"/>
+      <Setter Property="Padding" Value="5" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
     	<Setter Property="Template">
     		<Setter.Value>
     			<ControlTemplate TargetType="Button">
@@ -124,7 +127,7 @@
     							</VisualState>
     						</VisualStateGroup>
     					</VisualStateManager.VisualStateGroups>
-    					<Border x:Name="ButtonBackground" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="0" Margin="{StaticResource PhoneTouchTargetOverhang}">
+    					<Border x:Name="ButtonBackground" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="0" Margin="5">
     						<ContentControl x:Name="ContentContainer" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" Foreground="{TemplateBinding Foreground}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" Padding="{TemplateBinding Padding}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
     					</Border>
     				</Grid>

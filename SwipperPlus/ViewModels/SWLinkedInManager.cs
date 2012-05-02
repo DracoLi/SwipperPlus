@@ -50,7 +50,7 @@ namespace SwipperPlus.ViewModel
       throw new NotImplementedException();
     }
 
-    public override void UpdateFeeds()
+    public override void GetMoreFeeds()
     {
       throw new NotImplementedException();
     }
