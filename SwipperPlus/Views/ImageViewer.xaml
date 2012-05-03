@@ -10,10 +10,20 @@
     SupportedOrientations="Portrait" Orientation="Portrait">
 
   <Grid x:Name="LayoutRoot" Background="Transparent">
-    <toolkit:PerformanceProgressBar x:Name="progressBar" 
-                                    IsIndeterminate="False" 
-                                    Foreground="{StaticResource PhoneAccentBrush}" 
-                                    VerticalAlignment="Top" />
+    <!-- Loading View -->
+    <StackPanel Name="loadingView"
+                  Grid.Row="0"
+                  VerticalAlignment="Top" 
+                  Background="{StaticResource PhoneBackgroundBrush}">
+      <toolkit:PerformanceProgressBar x:Name="progressBar" 
+                                        IsIndeterminate="False" 
+                                        Foreground="{StaticResource PhoneAccentBrush}" 
+                                        VerticalAlignment="Top" />
+      <TextBlock Name="loadingText" 
+                   Text="Loading Image..." 
+                   Style="{StaticResource LoadingBarTextStyle}"/>
+    </StackPanel>
+    
     <Image x:Name="ImgZoom"
                Stretch="Uniform"
                RenderTransformOrigin="0,0">

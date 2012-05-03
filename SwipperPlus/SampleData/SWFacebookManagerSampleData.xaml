@@ -39,62 +39,7 @@
         </SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
       </SwipperPlus_Model_Facebook:FacebookFeed>
       
-      <SwipperPlus_Model_Facebook:FacebookFeed Date="04/28/2012 15:29:03" 
-                       FeedType="Action"
-                       Description="fasdfasdfasd"
-                                             HasMessage="False"
-                       XmlDescription="&lt;Section xml:space=&quot;preserve&quot; HasTrailingParagraphBreakOnPaste=&quot;False&quot; xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;&gt;&lt;Paragraph FontSize=&quot;17&quot; FontFamily=&quot;Segoe WP&quot; Foreground=&quot;#FFFFFFFF&quot;&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;Run  FontWeight=&quot;Bold&quot; Foreground=&quot;DarkCyan&quot; Text=&quot;Ellie Chan&quot; /&gt;&lt;Run Text=&quot; shared &quot; /&gt;&lt;Run  FontWeight=&quot;Bold&quot; Foreground=&quot;DarkCyan&quot; Text=&quot;ÈË¶þµÄ²å»­ÐÇÇò&quot; /&gt;&lt;Run Text=&quot;'s photo.&quot; /&gt;&lt;/Paragraph&gt;&lt;/Section&gt;">
-        <SwipperPlus_Model_Facebook:FacebookFeed.Attachment>
-          <SwipperPlus_Model_Facebook:FacebookAttachment Type="Image"  Icon="http://photos-g.ak.fbcdn.net/hphotos-ak-ash3/564245_10150788010258501_501213500_9632372_168257755_s.jpg" Source="http://www.facebook.com/photo.php?fbid=10150788010258501 set=at.10150788005893501.435525.501213500.509767521 type=1" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.Attachment>
-        <SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-          <SwipperPlus_Model_Facebook:FacebookUser DisplayName="Vik Mundkur" Icon="http://profile.ak.fbcdn.net/hprofile-ak-snc4/572980_509767521_1765045104_q.jpg" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-        <SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-          <SwipperPlus_Model_Facebook:FacebookItem CommentsCount="0" LikesCount="66"/>
-        </SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-      </SwipperPlus_Model_Facebook:FacebookFeed>
-
-      <SwipperPlus_Model_Facebook:FacebookFeed Date="04/28/2012 15:29:03" 
-                       FeedType="Attachment"
-                       Message="fasdfasd"
-                                             HasMessage="True"
-                       XmlMessage="&lt;Section xml:space=&quot;preserve&quot; HasTrailingParagraphBreakOnPaste=&quot;False&quot; xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;&gt;&lt;Paragraph FontSize=&quot;17&quot; FontFamily=&quot;Segoe WP&quot; Foreground=&quot;#FFFFFFFF&quot;&gt;&lt;Run Text=&quot;Pure genius. &quot; /&gt;&lt;/Paragraph&gt;&lt;/Section&gt;">
-        <SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-          <SwipperPlus_Model_Facebook:FacebookUser DisplayName="Katie Mattina" Icon="http://profile.ak.fbcdn.net/hprofile-ak-snc4/573514_517384566_1770330592_q.jpg" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-        <SwipperPlus_Model_Facebook:FacebookFeed.Attachment>
-          <SwipperPlus_Model_Facebook:FacebookAttachment Name="Mobile Uploads" Type="Image"  Icon="http://photos-b.ak.fbcdn.net/hphotos-ak-snc7/389735_10150573340514567_517384566_7841544_1024375815_s.jpg" Source="http://www.facebook.com/photo.php?fbid=10150573340514567 set=a.454441369566.224198.517384566 type=1" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.Attachment>
-        <SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-          <SwipperPlus_Model_Facebook:FacebookItem CommentsCount="10" LikesCount="10" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-      </SwipperPlus_Model_Facebook:FacebookFeed>
-
-      <SwipperPlus_Model_Facebook:FacebookFeed Date="04/28/2012 15:29:03" 
-                       FeedType="Action"
-                       Description="fasdfasdf"
-                       XmlDescription="&lt;Section xml:space=&quot;preserve&quot; HasTrailingParagraphBreakOnPaste=&quot;False&quot; xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;&gt;&lt;Paragraph FontSize=&quot;18.5&quot; FontFamily=&quot;Segoe WP&quot; Foreground=&quot;#FFFFFFFF&quot; FontWeight=&quot;Normal&quot; FontStyle=&quot;Normal&quot; FontStretch=&quot;Normal&quot; TextAlignment=&quot;Left&quot;&gt;&lt;Run Text=&quot;&quot; /&gt;&lt;Hyperlink NavigateUri=&quot;/Views/SWBrowser.xaml/value=Will%20Fang type=user &quot;&gt;Will Fang&lt;/Hyperlink&gt;&lt;Run Text=&quot; added a life event to April 2012 on his timeline: Moved to Hong Kong&quot; /&gt;&lt;/Paragraph&gt;&lt;/Section&gt;">
-        <SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-          <SwipperPlus_Model_Facebook:FacebookUser DisplayName="Will Fang" Icon="http://profile.ak.fbcdn.net/hprofile-ak-snc4/573180_81011402_92482634_q.jpg" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-        <SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-          <SwipperPlus_Model_Facebook:FacebookItem CommentsCount="0" LikesCount="0" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-      </SwipperPlus_Model_Facebook:FacebookFeed>
-
-      <SwipperPlus_Model_Facebook:FacebookFeed Date="04/28/2012 15:29:03" 
-                       FeedType="Attachment"
-                       Description="fasdfasdf"
-                       XmlDescription="&lt;Section xml:space=&quot;preserve&quot; HasTrailingParagraphBreakOnPaste=&quot;False&quot; xmlns=&quot;http://schemas.microsoft.com/winfx/2006/xaml/presentation&quot;&gt;&lt;Paragraph FontSize=&quot;18.5&quot; FontFamily=&quot;Segoe WP&quot; Foreground=&quot;#FFFFFFFF&quot; FontWeight=&quot;Normal&quot; FontStyle=&quot;Normal&quot; FontStretch=&quot;Normal&quot; TextAlignment=&quot;Left&quot;&gt;&lt;Run Text=&quot;Who wants one?\n\n(via: &quot; /&gt;&lt;Hyperlink NavigateUri=&quot;/Views/SWBrowser.xaml/type=link value=http://bit.ly/IfYZdV&quot;&gt;http://bit.ly/IfYZdV&lt;/Hyperlink&gt;&lt;Run Text=&quot;)&quot; /&gt;&lt;/Paragraph&gt;&lt;/Section&gt;">
-        <SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-          <SwipperPlus_Model_Facebook:FacebookUser DisplayName="IGN.com" Icon="http://profile.ak.fbcdn.net/hprofile-ak-snc4/373243_59685491632_421945533_q.jpg" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.SourceUser>
-        <SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-          <SwipperPlus_Model_Facebook:FacebookItem CommentsCount="10" LikesCount="10" />
-        </SwipperPlus_Model_Facebook:FacebookFeed.SocialProperties>
-      </SwipperPlus_Model_Facebook:FacebookFeed>
-
+ 
     </SwipperPlus_Model_Facebook:FacebookFeedList>
   </SwipperPlus_ViewModel:SWFacebookManager.Feeds>
 </SwipperPlus_ViewModel:SWFacebookManager>

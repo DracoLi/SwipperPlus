@@ -15,5 +15,9 @@ namespace SwipperPlus.Settings
   {
     public const int InitialFeedsToGet = 30;
     public const int AdditionalFeedsToGet = 10;
+
+    // The delay to fetch new feeds right after fetching some feeds
+    public const int FetchDelay = 1000;
+    public const int RefreshDelay = 1000 * 60 * 60; // 1hr
   }
 }

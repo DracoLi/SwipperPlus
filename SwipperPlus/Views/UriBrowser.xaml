@@ -30,10 +30,7 @@
                                         VerticalAlignment="Top" />
       <TextBlock Name="loadingText" 
                    Text="Loading Website..." 
-                   Foreground="{StaticResource PhoneContrastBackgroundBrush}" 
-                   VerticalAlignment="Bottom" 
-                   TextAlignment="Left" 
-                   FontSize="18" />
+                   Style="{StaticResource LoadingBarTextStyle}"/>
     </StackPanel>
     <phone:WebBrowser x:Name="dracoBrowser" 
                         Grid.Row="1" 

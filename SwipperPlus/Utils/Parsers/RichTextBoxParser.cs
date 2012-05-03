@@ -43,7 +43,7 @@ namespace SwipperPlus.Utils.Parsers
     /// <param name="tags">Tags in the message</param>
     /// <param name="me">The tag that is the source person of the feed</param>
     /// <returns></returns>
-    internal static string ParseStringToXamlWithTags(string msg, IList<SWTag> tags = null, bool isDescription = false)
+    internal static string ParseStringToXamlWithTags(string msg, IList<SWTag> tags = null, bool isDescription = false, bool isTwitter = false)
     {
       IDictionary<string, string> styles = GetDefaultStyles();
 
@@ -55,6 +55,8 @@ namespace SwipperPlus.Utils.Parsers
       {
         foreach (SWTag tag in tags)
         {
+          if (tag.Offset < 0) continue;
+
           string oneTag = msg.Substring(tag.Offset, tag.Length);
 
           // We only do explicit tags.
@@ -65,9 +67,9 @@ namespace SwipperPlus.Utils.Parsers
           if (tag.Type == SWTag.TagType.Link)
           {
             string navigationuri = GeneralUtils.UriForWebsiteNavigation(HttpUtility.UrlPathEncode(tag.DisplayValue)).ToString();
-            navigationuri = navigationuri.Replace("&", "&amp;amp;");
+            navigationuri = navigationuri.Replace("&", "&amp;");
             replacement = "\" /><Hyperlink" + 
-              makeAttribute("FontSize", styles["DefaultFeedSize"]) +
+              makeAttribute("FontSize", (Int16.Parse(styles["DefaultFeedSize"])+.5).ToString()) +
               makeAttribute("FontFamily", styles["DefaultFeedFont"]) +
               makeAttribute("Foreground", styles["DefaultLinkColor"]) +
               makeAttribute("NavigateUri", navigationuri) +
@@ -97,12 +99,15 @@ namespace SwipperPlus.Utils.Parsers
         }
       }
 
-      // Replace all links
-      string linkUri = GeneralUtils.UriForWebsiteNavigation("$1").ToString().Replace("&", "&amp;amp;");
-      string linkReplacement = "\" /><Hyperlink " + makeAttribute("Foreground", styles["DefaultLinkColor"]) +
-        " NavigateUri=\"" + linkUri + "\">$1</Hyperlink><Run Text=\"";
-      Regex regex = new Regex(urlregex);
-      msg = regex.Replace(msg, linkReplacement);
+      // Replace all links if not twitter
+      if (!isTwitter)
+      {
+        string linkUri = GeneralUtils.UriForWebsiteNavigation("$1").ToString().Replace("&", "&amp;amp;");
+        string linkReplacement = "\" /><Hyperlink " + makeAttribute("Foreground", styles["DefaultLinkColor"]) +
+          " NavigateUri=\"" + linkUri + "\">$1</Hyperlink><Run Text=\"";
+        Regex regex = new Regex(urlregex);
+        msg = regex.Replace(msg, linkReplacement);
+      }
 
       // Parse new lines and other things
       if (isDescription)

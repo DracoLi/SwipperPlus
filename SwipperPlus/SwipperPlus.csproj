@@ -111,6 +111,7 @@
     <Compile Include="Model\SWToken.cs" />
     <Compile Include="Model\Twitter\SWTwitterAttachment.cs" />
     <Compile Include="Model\Twitter\SWTwitterFeed.cs" />
+    <Compile Include="Model\Twitter\SWTwitterFeedList.cs" />
     <Compile Include="Model\Twitter\SWTwitterUser.cs" />
     <Compile Include="Settings\GeneralSettings.cs" />
     <Compile Include="Settings\SWLinkedInSettings.cs" />
@@ -134,7 +135,6 @@
     <Compile Include="Utils\StorageUtils.cs" />
     <Compile Include="ViewModels\ConnectionManager.cs" />
     <Compile Include="ViewModels\SWFacebookManager.cs" />
-    <Compile Include="ViewModels\SWLinkedInManager.cs" />
     <Compile Include="ViewModels\SWSocialLinkManager.cs" />
     <Compile Include="ViewModels\SWTwitterManager.cs" />
     <Compile Include="Views\AuthorizationView.xaml.cs">

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Facebook;
@@ -7,6 +8,7 @@ using SwipperPlus.Utils;
 using SwipperPlus.Utils.Parsers;
 using SwipperPlus.Model.Facebook;
 using SwipperPlus.Settings;
+using SwipperPlus.Views;
 
 namespace SwipperPlus.ViewModel
 {
@@ -19,11 +21,7 @@ namespace SwipperPlus.ViewModel
     /// Every facebook feed for the user
     /// </summary>
     public ObservableCollection<FacebookFeedList> Feeds { set; get; }
-
-    /// <summary>
-    /// This specifies the amount of feeds to get when user want more
-    /// </summary>
-    private int amountToGrab = 10;
+    string lastRawData;
 
     /// <summary>
     /// Title of this social link, used by pivot item header
@@ -42,11 +40,25 @@ namespace SwipperPlus.ViewModel
 
     public SWFacebookManager()
     {
-      if (!SWFacebookSettings.IsConnected()) throw new Exception("Social link must be connected!");
+      if (!SWFacebookSettings.IsConnected()) 
+        throw new Exception("Social link must be connected!");
 
+      // Set up feeds
+      Feeds = new ObservableCollection<FacebookFeedList>();
+      FacebookFeedList list = new FacebookFeedList();
+      Feeds.Add(list);
+      LoadSavedFeeds();
+
+      // Set up others
       People = new Dictionary<ulong, FacebookUser>();
       fb = new FacebookClient(SWFacebookSettings.GetAccessToken());
       fb.GetCompleted += new EventHandler<FacebookApiEventArgs>(fb_GetCompleted);
+      IsUpdating = false;
+    }
+
+    public override int FeedCount
+    {
+      get { return Feeds[0].Count; }
     }
 
     /// <summary>
@@ -54,12 +66,15 @@ namespace SwipperPlus.ViewModel
     /// </summary>
     public override void FetchFeeds()
     {
+      if (IsUpdating) return;
+
       // Do this so that we know we are fetching new feeds
       CurrentAction = FeedAction.New;
       string q1, q2, q3;
       getQueries(out q1, out q2, out q3);
       string[] queries = { q1, q2, q3 };
       fb.QueryAsync(queries);
+      IsUpdating = true;
     }
 
     /// <summary>
@@ -68,15 +83,18 @@ namespace SwipperPlus.ViewModel
     /// <param name="amount"></param>
     public override void GetMoreFeeds()
     {
+      if (IsUpdating) return;
+
       // Update new feeds if we have some feeds already
-      if (Feeds != null && Feeds.Count > 0 && Feeds[0].Count > 0)
+      if (Feeds[0].Count > 0)
       {
-        long lastTime = GeneralUtils.DateTimeToUnixTimestamp(Feeds[0][Feeds.Count-1].Date);
+        long lastTime = GeneralUtils.DateTimeToUnixTimestamp(Feeds[0][Feeds[0].Count-1].Date);
         CurrentAction = FeedAction.More;
         string q1, q2, q3;
         getQueries(out q1, out q2, out q3, lastTime);
         string[] queries = { q1, q2, q3 };
         fb.QueryAsync(queries);
+        IsUpdating = true;
       }
       else
       {
@@ -87,17 +105,13 @@ namespace SwipperPlus.ViewModel
 
     public override void SaveFeeds()
     {
-      throw new NotImplementedException();
+      StorageUtils.SetKeyValue<string>("FacebookFeeds", lastRawData);
     }
 
     public override void LoadSavedFeeds()
     {
-      throw new NotImplementedException();
-    }
-
-    public override bool HaveSavedFeeds()
-    {
-      throw new NotImplementedException();
+      if (StorageUtils.HasKeyValue("FacebookFeeds"))
+        parseRawData(StorageUtils.GetKeyValue<string>("FacebookFeeds"));
     }
 
     /// <summary>
@@ -109,13 +123,26 @@ namespace SwipperPlus.ViewModel
       if (e.Error != null)
       {
         System.Diagnostics.Debug.WriteLine(e.Error.Message);
+        IsUpdating = false;
         OnRaiseFeedsEvent(new SocialLinkEventArgs(e.Error.Message));
         return;
       }
 
       // Parse json results to facebook feeds
-      System.Diagnostics.Debug.WriteLine(e.GetResultData().ToString());
-      JArray rawFeeds = JArray.Parse(e.GetResultData().ToString());
+      parseRawData(e.GetResultData().ToString());
+
+      // Save data for persistence.
+      if (CurrentAction == FeedAction.New)
+        lastRawData = e.GetResultData().ToString();
+    }
+
+    /// <summary>
+    /// Parses facebook json into feeds for this manager
+    /// </summary>
+    /// <param name="data"></param>
+    private void parseRawData(string data)
+    {
+      JArray rawFeeds = JArray.Parse(data);
 
       // Update our people list (add person if not in there already)
       for (int i = 1; i < 3; i++)
@@ -128,36 +155,28 @@ namespace SwipperPlus.ViewModel
         }
       }
 
-      // Determine current feed status
-      FacebookFeedList list = null;
-      if (CurrentAction == FeedAction.New)
+      // Update our feeds, this effects UI so done in UI thread
+      Deployment.Current.Dispatcher.BeginInvoke(() =>
       {
-        Feeds = new ObservableCollection<FacebookFeedList>();
-        list = new FacebookFeedList();
-      }
-      else if (CurrentAction == FeedAction.More)
-      {
-        list = Feeds[0];
-      }
+        if (CurrentAction == FeedAction.New)
+          Feeds[0].Clear();
 
-      // Look through all feeds, parsing feeds one by one
-      IEnumerable<JToken> rawfeeds = rawFeeds[0]["fql_result_set"].Children();
-      foreach (JToken oneResult in rawfeeds)
-      {
-        FacebookFeed feed = FacebookParser.ParseFeed(oneResult, People);
+        // Look through all feeds, parsing feeds one by one
+        IEnumerable<JToken> rawfeeds = rawFeeds[0]["fql_result_set"].Children();
+        foreach (JToken oneResult in rawfeeds)
+        {
+          FacebookFeed feed = FacebookParser.ParseFeed(oneResult, People);
 
-        // Check if we discarded this feed when parsing by setting it to null
-        if (list != null)
-          list.Add(feed);
-      }
+          // Check if we discarded this feed when parsing by setting it to null
+          if (feed != null)
+            Feeds[0].Add(feed);
+        }
 
-      // Add feeds to our list only if we getting new ones
-      //  Else it is already added
-      if (CurrentAction == FeedAction.New)
-        Feeds.Add(list);
-
-      // Raise feeds parsed event
-      OnRaiseFeedsEvent(new SocialLinkEventArgs(CurrentAction));
+        // Raise feeds parsed event
+        IsUpdating = false;
+        LastUpdated = DateTime.Now;
+        OnRaiseFeedsEvent(new SocialLinkEventArgs(CurrentAction));
+      });
     }
 
     private void getQueries(out string q1, out string q2, out string q3, long lastTime = 0)
@@ -179,7 +198,7 @@ namespace SwipperPlus.ViewModel
       if (CurrentAction == FeedAction.New)
       {
         q1 += "ORDER BY created_time DESC ";
-        q1 += "LIMIT " + GeneralSettings.InitialFeedsToGet + " ";
+        q1 += "LIMIT 50";
       }
       
       q2 = "SELECT id, name, pic_square FROM profile WHERE id IN (SELECT actor_id FROM #query0)";

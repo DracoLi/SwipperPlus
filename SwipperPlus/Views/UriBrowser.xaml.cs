@@ -22,6 +22,7 @@ namespace SwipperPlus.Views
     {
       base.OnNavigatedTo(e);
 
+      System.Diagnostics.Debug.WriteLine(e.Uri.ToString());
       string type = NavigationContext.QueryString["type"];
       string value = NavigationContext.QueryString["value"];
 
@@ -34,20 +35,20 @@ namespace SwipperPlus.Views
 
     private void authBrowser_Navigating(object sender, NavigatingEventArgs e)
     {
-      showLoadingView();
+      showLoadingBar();
       dracoBrowser.Visibility = Visibility.Visible;
     }
 
     private void authBrowser_LoadCompleted(object sender, NavigationEventArgs e)
     {
       // Hide loading view when page is loaded
-      hideLoadingView();
+      hideLoadingBar();
     }
 
     /// <summary>
     /// Display a loading view
     /// </summary>
-    public void showLoadingView()
+    public void showLoadingBar()
     {
       loadingView.Visibility = Visibility.Visible;
       progressBar.IsIndeterminate = true;
@@ -56,7 +57,7 @@ namespace SwipperPlus.Views
     /// <summary>
     /// Hide the current loading view
     /// </summary>
-    public void hideLoadingView()
+    public void hideLoadingBar()
     {
       loadingView.Visibility = Visibility.Collapsed;
       progressBar.IsIndeterminate = false;

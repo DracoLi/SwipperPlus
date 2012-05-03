@@ -6,9 +6,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
-    xmlns:views="clr-namespace:SwipperPlus.Views.Facebook"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit" 
+    xmlns:views="clr-namespace:SwipperPlus.Views"
     x:Class="SwipperPlus.MainPage"
-    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="696"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
     Background="{StaticResource DefaultPageBackround}"
@@ -17,8 +18,11 @@
     shell:SystemTray.IsVisible="True">
 
   <phone:PhoneApplicationPage.ApplicationBar>
-    <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True">
+    <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" Opacity=".6" Mode="Minimized">
       <shell:ApplicationBar.MenuItems>
+        <shell:ApplicationBarMenuItem Click="RefreshCurrentLink" 
+                                      Text="Refresh"
+                                      IsEnabled="False"/>
         <shell:ApplicationBarMenuItem Click="ShowAuthorizationView" Text="Accounts"/>
         <shell:ApplicationBarMenuItem Click="ShowSettingsView" Text="Settings"/>
       </shell:ApplicationBar.MenuItems>
@@ -35,40 +39,21 @@
     <!--ContentPanel - place additional content here-->
     <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
       
+      <!-- Loading View -->
+      <StackPanel Name="loadingView"
+                  Grid.Row="0"
+                  VerticalAlignment="Top" 
+                  Background="{StaticResource PhoneBackgroundBrush}">
+        <toolkit:PerformanceProgressBar x:Name="progressBar" 
+                                        IsIndeterminate="False" 
+                                        Foreground="{StaticResource PhoneAccentBrush}" 
+                                        VerticalAlignment="Top" />
+        <TextBlock Name="loadingText" 
+                   Style="{StaticResource LoadingBarTextStyle}" />
+      </StackPanel>
+      
       <!--Pivot Control-->
-      <controls:Pivot Title="Swipper+" Name="MainPivot">
-        <controls:PivotItem Header="Twitter">
-          <StackPanel>
-            <views:FBPivotView x:Name="TwitterView" HorizontalAlignment="Stretch" Height="600"/>
-          </StackPanel>
-        </controls:PivotItem>
-        <!--
-        <controls:PivotItem Header="first">
-          <ListBox x:Name="FirstListBox" Margin="0,0,-12,0" ItemsSource="{Binding Items}">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <StackPanel Margin="0,0,0,17" Width="432" Height="78">
-                  <TextBlock Text="{Binding LineOne}" TextWrapping="Wrap" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
-                  <TextBlock Text="{Binding LineTwo}" TextWrapping="Wrap" Margin="12,-6,12,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
-                </StackPanel>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </controls:PivotItem>
-
-        <controls:PivotItem Header="second">
-          <ListBox x:Name="SecondListBox" Margin="0,0,-12,0" ItemsSource="{Binding Items}">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <StackPanel Margin="0,0,0,17">
-                  <TextBlock Text="{Binding LineOne}" TextWrapping="NoWrap" Margin="12,0,0,0" Style="{StaticResource PhoneTextExtraLargeStyle}"/>
-                  <TextBlock Text="{Binding LineThree}" TextWrapping="NoWrap" Margin="12,-6,0,0" Style="{StaticResource PhoneTextSubtleStyle}"/>
-                </StackPanel>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
-        </controls:PivotItem>
-        -->
+      <controls:Pivot Title="Swipper+" Name="MainPivot" SelectionChanged="MainPivot_SelectionChanged">
       </controls:Pivot>
     </Grid>
   </Grid>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Controls;
 using SwipperPlus.Model;
 
 namespace SwipperPlus.ViewModel
@@ -13,6 +14,12 @@ namespace SwipperPlus.ViewModel
     public abstract string Title { get; }
 
     public FeedAction CurrentAction { get; set; }
+
+    public bool IsUpdating { get; set; }
+
+    public DateTime LastUpdated { get; set; }
+
+    public abstract int FeedCount { get; }
 
     /// <summary>
     /// Fetch all feeds from this social link

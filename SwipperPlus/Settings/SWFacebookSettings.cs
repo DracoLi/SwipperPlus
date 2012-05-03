@@ -21,7 +21,7 @@ namespace SwipperPlus.Settings
         {"client_id", ConsumerKey},
         {"response_type", "token"},
         {"display", "touch"},
-        {"scope", "read_stream,user_groups,manage_notifications"},
+        {"scope", "read_stream,user_groups"},
         {"redirect_uri", "http://www.facebook.com/connect/login_success.html"}
       };
       return loginParameters;

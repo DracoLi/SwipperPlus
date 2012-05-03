@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Windows;
+using System.Linq;
 using System.Collections.Generic;
 using TweetSharp;
 using SwipperPlus.Model.Twitter;
+using SwipperPlus.Model;
 
 namespace SwipperPlus.Utils.Parsers
 {
@@ -49,14 +51,75 @@ namespace SwipperPlus.Utils.Parsers
         result.OriginalUser = result.TweetedUser;
         result.Message = tweet.Text;
       }
-      result.XmlMessage = RichTextBoxParser.ParseStringToXamlWithTags(result.Message);
 
-      // Get attached urls
-      if (tweet.Entities.Urls != null && tweet.Entities.Urls.Count > 0)
+      #region Adding tags in Message
+      
+      result.MessageTags = new List<SWTag>();
+      TwitterEntities entities = tweet.Entities;
+      if (result.IsRetweet) 
+        entities = tweet.RetweetedStatus.Entities;
+
+      // Add url tags
+      if (entities.Urls != null &&
+        entities.Urls.Count > 0)
       {
-        result.Urls = new List<TwitterUrl>(tweet.Entities.Urls.Count);
-        foreach (TwitterUrl url in tweet.Entities.Urls)
-          result.Urls.Add(url);
+        foreach (TwitterUrl url in entities.Urls)
+        {
+          SWTag tag = new SWTag();
+          tag.Type = SWTag.TagType.Link;
+          tag.DisplayValue = url.Value;
+          tag.Length = url.EndIndex - url.StartIndex;
+          tag.Offset = url.StartIndex;
+          result.MessageTags.Add(tag);
+        }
+      }
+
+      // Add mentions
+      if (entities.Mentions != null &&
+        entities.Mentions.Count > 0)
+      {
+        foreach (TwitterMention one in entities.Mentions)
+        {
+          SWTag tag = new SWTag();
+          tag.Type = SWTag.TagType.Mention;
+          tag.DisplayValue = "@" + one.ScreenName;
+          tag.Length = one.EndIndex - one.StartIndex;
+          tag.Offset = one.StartIndex;
+          result.MessageTags.Add(tag);
+        }
+      }
+
+      // Add hashtags
+      if (entities.HashTags != null &&
+        entities.HashTags.Count > 0)
+      {
+        foreach (TwitterHashTag one in entities.HashTags)
+        {
+          SWTag tag = new SWTag();
+          tag.Type = SWTag.TagType.Hashtag;
+          tag.DisplayValue = "#" + one.Text;
+          tag.Length = one.EndIndex - one.StartIndex;
+          tag.Offset = one.StartIndex;
+          result.MessageTags.Add(tag);
+        }
+      }
+
+      // Sort all tags in desending offset order to aid replacement
+      if (result.MessageTags.Count > 0)
+        result.MessageTags = result.MessageTags.OrderByDescending(x => x.Offset).ToList();
+      
+      #endregion
+
+      result.XmlMessage = RichTextBoxParser.ParseStringToXamlWithTags(result.Message, 
+        result.MessageTags, isTwitter: true);
+
+      // Add an photo if exists
+      if (tweet.Entities.Media != null &&
+        tweet.Entities.Media.Count > 0 &&
+        tweet.Entities.Media[0].MediaType == TwitterMediaType.Photo)
+      {
+        TwitterMedia media = tweet.Entities.Media[0];
+        result.PhotoUrl = new Uri(media.MediaUrl);
       }
 
       return result;

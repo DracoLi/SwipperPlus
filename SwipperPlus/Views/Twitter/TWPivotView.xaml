@@ -6,7 +6,8 @@
     xmlns:delay="clr-namespace:Delay;assembly=PhonePerformance"
     xmlns:MyControls="clr-namespace:SwipperPlus.Controls"
     xmlns:convert="clr-namespace:SwipperPlus.Utils.Converters"
-    x:Class="SwipperPlus.Views.Twitter.TWPivotView"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
+    x:Class="SwipperPlus.Views.TWPivotView"
     mc:Ignorable="d"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -20,17 +21,21 @@
   <UserControl.Resources>
     <convert:BoolToVisibleConverter x:Name="VisibilityConverter"/>
     <convert:DateTimeToTwitterTimeConverter x:Name="TwitterTimeConverter"/>
+    <convert:NotNullToVisibilityConverter x:Key="NotNullToVisibilityConverter"/>
   </UserControl.Resources>
   
   <Grid x:Name="LayoutRoot" >
     <!--<MyControls:SWRichTextBox Text="{Binding Title}" />-->
-    <ListBox ItemsSource="{Binding Feeds}">
-      <ListBox.ItemContainerStyle>
-        <Style TargetType="ListBoxItem">
-          <Setter Property="HorizontalContentAlignment" Value="Stretch"></Setter>
-        </Style>
-      </ListBox.ItemContainerStyle>
-      <ListBox.ItemTemplate>
+    <toolkit:LongListSelector 
+      ItemsSource="{Binding Feeds}"
+      ScrollingStarted="LongListSelector_ScrollingStarted"
+      StretchingBottom="LongListSelector_StretchingBottom">
+      <toolkit:LongListSelector.ListFooterTemplate>
+        <DataTemplate>
+          <StackPanel Height="30" />
+        </DataTemplate>
+      </toolkit:LongListSelector.ListFooterTemplate>
+      <toolkit:LongListSelector.ItemTemplate>
         <DataTemplate>
           <!-- Outer layer -->
           <StackPanel>
@@ -44,39 +49,48 @@
                                      VerticalAlignment="Top" 
                                      PlaceholderSource="/images/y_normal.png"
                                      Source="{Binding Path=OriginalUser.Icon}" />
-              <!--
-              <MyControls:PlaceImage.Clip>
-                <RectangleGeometry RadiusX="6" RadiusY="6" Rect="0,0,,48,48"/>
-              </MyControls:PlaceImage.Clip>
-              -->
-
-              <!--
-            <Image Grid.Column="0" Margin="10" Width="48" Height="48" Source="/Images/y_normal.png">
-              <Image.Clip>
-                  <RectangleGeometry RadiusX="6" RadiusY="6" Rect="0,0,,48,48"/>
-              </Image.Clip>
-            </Image>
-            -->
+              
+              <!-- Content -->
               <StackPanel Grid.Column="1">
-                <Grid>
-                  <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                  </Grid.ColumnDefinitions>
-                  <TextBlock Grid.Column="0" Text="{Binding OriginalUser.DisplayName, Mode=OneWay}" />
-                  <TextBlock Grid.Column="1" Text="{Binding Date, Mode=OneWay, Converter={StaticResource TwitterTimeConverter}}" />
-                </Grid>
-                <MyControls:SWRichTextBox Text="{Binding XmlMessage}" Margin="-12,0,0,0" />
+                
+                <!-- Name -->
+                <TextBlock Grid.Column="0" 
+                           Text="{Binding OriginalUser.DisplayName, Mode=OneWay}" 
+                           Foreground="{StaticResource EmphasizeFeedColor}"/>
+                
+                <!-- Message -->
+                <MyControls:SWRichTextBox Text="{Binding XmlMessage}" 
+                                          Margin="-12,0,0,0" />
+                
+                <!-- Retweet -->
                 <StackPanel Orientation="Horizontal"
                             Visibility="{Binding Path=IsRetweet,Converter={StaticResource VisibilityConverter}}"> 
-                  <TextBlock Text="Retweeted by " />
-                  <TextBlock Text="{Binding TweetedUser.DisplayName}" />
+                  <TextBlock Text="Retweeted by "
+                             Foreground="{StaticResource DeEmphasizeFeedColor}"/>
+                  <TextBlock Text="{Binding TweetedUser.DisplayName}"
+                             Foreground="{StaticResource DefaultMentionsColor}"/>
                 </StackPanel>
+                
+                <!-- Attached Image -->
+                <Button Margin="0,2,0,0"
+                        Style="{StaticResource ImageBorderButton}"
+                        toolkit:TiltEffect.IsTiltEnabled="True"
+                        Tag="{Binding PhotoUrl}"
+                        Click="ImageAttachment_Click"
+                        Visibility="{Binding PhotoUrl, Converter={StaticResource NotNullToVisibilityConverter}}">
+                  <Button.Content>
+                    <Image HorizontalAlignment="Left"
+                           Source="{Binding PhotoUrl}"
+                           MaxWidth="300"
+                           Margin="0"/>
+                  </Button.Content>
+                </Button>
+                
               </StackPanel>
             </Grid>
           </StackPanel>
         </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
+      </toolkit:LongListSelector.ItemTemplate>
+    </toolkit:LongListSelector>
   </Grid>
 </UserControl>

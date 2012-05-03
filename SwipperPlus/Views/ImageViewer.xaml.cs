@@ -54,15 +54,21 @@ namespace SwipperPlus.Views
       stopLoadingScreen();
     }
 
+    #region UI methods
+   
     void showLoadingScreen()
     {
+      loadingView.Visibility = Visibility.Visible;
       progressBar.IsIndeterminate = true;
     }
 
     void stopLoadingScreen()
     {
+      loadingView.Visibility = Visibility.Collapsed;
       progressBar.IsIndeterminate = false;
     }
+    
+    #endregion
 
     // these two fields fully define the zoom state:
     private double TotalImageScale = 1d;

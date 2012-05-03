@@ -16,12 +16,7 @@
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
-    <StackPanel x:Name="LayoutRoot" Background="Transparent">
-        <phone:WebBrowser Height="Auto" x:Name="authBrowser" 
-                          IsScriptEnabled="True" 
-                          Navigating="authBrowser_Navigating" 
-                          LoadCompleted="authBrowser_LoadCompleted" 
-                          Visibility="Visible" Grid.Row="0"/>
+    <Grid x:Name="LayoutRoot" Background="Transparent">
         <StackPanel Name="loadingView" 
                     VerticalAlignment="Top" 
                     Grid.Row="0">
@@ -36,7 +31,12 @@
                      TextAlignment="Left"
                      FontSize="18" />
         </StackPanel>
-    </StackPanel>
+    <phone:WebBrowser Height="Auto" x:Name="authBrowser" 
+                          IsScriptEnabled="True" 
+                          Navigating="authBrowser_Navigating" 
+                          LoadCompleted="authBrowser_LoadCompleted" 
+                          Visibility="Visible" Grid.Row="0"/>
+  </Grid>
  
     <!--Sample code showing usage of ApplicationBar-->
     <!--<phone:PhoneApplicationPage.ApplicationBar>
